@@ -974,6 +974,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- Page 3: Attachment (Activity Photos) -->
+        <div class="page-break"></div>
+        <div style="border: 2px solid #ccc; padding: 25px; border-radius: 10px; background: #fff; min-height: 24cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; margin-top: 0.5cm; font-size: 15px;">
+            <div>
+                <div class="text-center mb-3">
+                    <h3 class="fw-bold" style="font-size: 20px; margin-bottom: 5px;">เอกสารแนบท้ายใบรับรองผลการรับการนิเทศภายใน</h3>
+                    <h5 class="text-muted" style="font-size: 15px; margin-bottom: 5px;">ภาพกิจกรรมการจัดการเรียนการสอน</h5>
+                    <p class="mb-0" style="font-size: 15px;">ผู้รับการนิเทศ: <strong><span id="cert-teacher-name-page3">--</span></strong></p>
+                </div>
+                
+                <div class="row g-3 mt-2">
+                    <div class="col-6 text-center">
+                        <div class="border p-2 rounded" style="background:#f9f9f9;">
+                            <img id="cert-img1" src="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; background: #eee;" alt="รูปภาพที่ 1">
+                            <div class="mt-1 small fw-bold">รูปภาพที่ 1: บรรยากาศห้องเรียน</div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="border p-2 rounded" style="background:#f9f9f9;">
+                            <img id="cert-img2" src="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; background: #eee;" alt="รูปภาพที่ 2">
+                            <div class="mt-1 small fw-bold">รูปภาพที่ 2: การทำกิจกรรมของนักเรียน</div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="border p-2 rounded" style="background:#f9f9f9;">
+                            <img id="cert-img3" src="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; background: #eee;" alt="รูปภาพที่ 3">
+                            <div class="mt-1 small fw-bold">รูปภาพที่ 3: สื่อ/ชิ้นงาน หรือใบงานนักเรียน</div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="border p-2 rounded" style="background:#f9f9f9;">
+                            <img id="cert-img4" src="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; background: #eee;" alt="รูปภาพที่ 4">
+                            <div class="mt-1 small fw-bold">รูปภาพที่ 4: ครูผู้สอนขณะจัดกิจกรรม</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้รับการนิเทศ<br>( <span class="cert-teacher-name-sig">--</span> )</p>
+                </div>
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้นิเทศ<br>(นายศรัณย์ภัทร กาญจนาคม)<br>ผู้อำนวยการโรงเรียนวัดบ้านดาบ</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ========================================================== -->
@@ -2549,6 +2597,27 @@
                         `;
                     }
                     $("#cert-detailed-scores-tbody").html(detailedRows);
+
+                    // ดึงภาพถ่าย 4 รูปที่ครูอัปโหลด (เปรียบเทียบชื่อโดยตัดช่องว่างออกเพื่อป้องกันปัญหาวรรคเบิ้ล)
+                    $("#cert-teacher-name-page3").text(matchEval.TeacherName || matchEval.teacherName);
+                    
+                    const cleanName = (name) => name ? name.replace(/\s+/g, "") : "";
+                    const matchSub = res.submissions.find(s => {
+                        const sName = cleanName(s.TeacherName || s.teacherName);
+                        const eName = cleanName(matchEval.TeacherName || matchEval.teacherName);
+                        return sName === eName;
+                    });
+
+                    const img1 = matchSub ? (matchSub.Image1Url || matchSub.image1Url) : "";
+                    const img2 = matchSub ? (matchSub.Image2Url || matchSub.image2Url) : "";
+                    const img3 = matchSub ? (matchSub.Image3Url || matchSub.image3Url) : "";
+                    const img4 = matchSub ? (matchSub.Image4Url || matchSub.image4Url) : "";
+
+                    $("#cert-img1").attr("src", img1 || "https://placehold.co/400x300?text=No+Image");
+                    $("#cert-img2").attr("src", img2 || "https://placehold.co/400x300?text=No+Image");
+                    $("#cert-img3").attr("src", img3 || "https://placehold.co/400x300?text=No+Image");
+                    $("#cert-img4").attr("src", img4 || "https://placehold.co/400x300?text=No+Image");
+
                     $(".print-container").removeClass("active-print");
                     $("#print-indiv-cert").addClass("active-print");
                     window.print();
