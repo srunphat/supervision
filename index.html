@@ -419,7 +419,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="card-custom p-4 h-100">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-star-fill me-2 text-warning"></i>ผลการนิเทศล่าสุด (5 รายการ)</h5>
+                        <h5 class="fw-bold mb-3" id="evaluations-header"><i class="bi bi-star-fill me-2 text-warning"></i>ผลการนิเทศล่าสุด (0 รายการ)</h5>
                         <div id="evaluations-scroller" class="d-flex flex-column gap-3 overflow-y-auto" style="max-height: 480px;">
                             <!-- Dynamic Content -->
                             <div class="text-muted text-center py-4">ไม่พบข้อมูลการประเมิน</div>
@@ -1687,6 +1687,9 @@
                         evalHtml = '<div class="text-muted text-center py-4">ไม่พบข้อมูลการประเมิน</div>';
                     }
                     $("#evaluations-scroller").html(evalHtml);
+
+                    const evalCount = res.latestEvaluations ? res.latestEvaluations.length : 0;
+                    $("#evaluations-header").html(`<i class="bi bi-star-fill me-2 text-warning"></i>ผลการนิเทศล่าสุด (${evalCount} รายการ)`);
 
                     let bookingRows = "";
                     if (res.latestBookings && res.latestBookings.length > 0) {
