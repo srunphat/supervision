@@ -231,6 +231,28 @@ function getAdminData() {
 function addBooking(payload) {
   var ss = getTargetSpreadsheet();
   var sheet = ss.getSheetByName("Bookings");
+  var data = sheet.getDataRange().getValues();
+  
+  // ตรวจสอบการจองซ้ำ
+  var newDateStr = normalizeDateString(payload.date);
+  var newPeriod = payload.period ? payload.period.toString().trim() : "";
+  
+  if (newDateStr !== "" && newPeriod !== "") {
+    for (var i = 1; i < data.length; i++) {
+      var rowDate = data[i][4];
+      var rowPeriod = data[i][6] ? data[i][6].toString().trim() : "";
+      var rowStatus = data[i][10] ? data[i][10].toString().trim() : "";
+      
+      if (rowStatus !== "Cancelled" && rowStatus !== "Rejected") {
+        if (normalizeDateString(rowDate) === newDateStr && rowPeriod === newPeriod) {
+          return { 
+            status: "error", 
+            message: "ขออภัยครับ คาบเรียนที่ " + newPeriod + " ในวันที่ " + formatDateThai(newDateStr) + " มีคุณครูท่านอื่นจองคิวรับการนิเทศไว้แล้ว" 
+          };
+        }
+      }
+    }
+  }
   
   var id = "BK" + new Date().getTime();
   var timestamp = new Date();
@@ -261,9 +283,31 @@ function updateBooking(payload) {
   var data = sheet.getDataRange().getValues();
   
   var id = payload.id;
+  var newDateStr = normalizeDateString(payload.date);
+  var newPeriod = payload.period ? payload.period.toString().trim() : "";
+  
+  // ตรวจสอบการจองซ้ำ (ยกเว้น ID ของตัวเอง)
+  if (newDateStr !== "" && newPeriod !== "") {
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === id) continue;
+      
+      var rowDate = data[i][4];
+      var rowPeriod = data[i][6] ? data[i][6].toString().trim() : "";
+      var rowStatus = data[i][10] ? data[i][10].toString().trim() : "";
+      
+      if (rowStatus !== "Cancelled" && rowStatus !== "Rejected") {
+        if (normalizeDateString(rowDate) === newDateStr && rowPeriod === newPeriod) {
+          return { 
+            status: "error", 
+            message: "ไม่สามารถแก้ไขได้เนื่องจาก คาบเรียนที่ " + newPeriod + " ในวันที่ " + formatDateThai(newDateStr) + " มีคุณครูท่านอื่นจองคิวรับการนิเทศไว้แล้ว" 
+          };
+        }
+      }
+    }
+  }
+  
   for (var i = 1; i < data.length; i++) {
     if (data[i][0] === id) {
-      // อัปเดตข้อมูลในแต่ละคอลัมน์ (เว้น ID และ Timestamp)
       sheet.getRange(i + 1, 3).setValue(payload.teacherName);
       sheet.getRange(i + 1, 4).setValue(payload.department);
       sheet.getRange(i + 1, 5).setValue(payload.date);
@@ -684,4 +728,53 @@ function getSubmissionImagesBase64(payload) {
   } catch (err) {
     return { status: "error", message: err.toString() };
   }
+}
+
+/**
+ * แปลงวันที่เป็น YYYY-MM-DD ตาม Timezone ของสเปรดชีต
+ */
+function normalizeDateString(dateVal) {
+  if (!dateVal) return "";
+  var dateObj;
+  if (dateVal instanceof Date) {
+    dateObj = dateVal;
+  } else {
+    var str = dateVal.toString().trim();
+    if (str === "") return "";
+    if (str.indexOf("T") !== -1) {
+      dateObj = new Date(str);
+    } else {
+      var parts = str.split("-");
+      if (parts.length === 3) {
+        dateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      } else {
+        dateObj = new Date(str);
+      }
+    }
+  }
+  
+  if (isNaN(dateObj.getTime())) return "";
+  
+  var spreadsheetTimezone = SpreadsheetApp.getActive().getSpreadsheetTimeZone();
+  return Utilities.formatDate(dateObj, spreadsheetTimezone, "yyyy-MM-dd");
+}
+
+/**
+ * จัดรูปแบบวันที่ให้เป็นภาษาไทยสไตล์สั้น (เช่น 25 มิ.ย. 2569)
+ */
+function formatDateThai(dateStr) {
+  if (!dateStr) return "";
+  var parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  var year = Number(parts[0]);
+  var month = Number(parts[1]);
+  var day = Number(parts[2]);
+  
+  var months = [
+    "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", 
+    "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+  ];
+  
+  var thaiYear = year + 543;
+  return day + " " + months[month - 1] + " " + thaiYear;
 }

@@ -1975,6 +1975,8 @@
                             $(form).removeClass("was-validated");
                             switchTab("dashboard");
                         });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'จองไม่สำเร็จ', text: res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', confirmButtonColor: '#2196F3' });
                     }
                 });
             });
@@ -2156,13 +2158,17 @@
                 };
 
                 Swal.fire({ title: 'กำลังเพิ่มรายการจอง...', didOpen: () => Swal.showLoading() });
-                callAPI("addBooking", data).then(() => {
+                callAPI("addBooking", data).then(res => {
                     Swal.close();
-                    modal.hide();
-                    form.reset();
-                    Swal.fire('เพิ่มสำเร็จ', 'เพิ่มรายการจองเรียบร้อย', 'success');
-                    loadAdminData();
-                    loadDashboard();
+                    if (res.status === "success") {
+                        modal.hide();
+                        form.reset();
+                        Swal.fire('เพิ่มสำเร็จ', 'เพิ่มรายการจองเรียบร้อย', 'success');
+                        loadAdminData();
+                        loadDashboard();
+                    } else {
+                        Swal.fire('เพิ่มไม่สำเร็จ', res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+                    }
                 });
             });
 
@@ -2186,12 +2192,16 @@
                 };
 
                 Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
-                callAPI("updateBooking", data).then(() => {
+                callAPI("updateBooking", data).then(res => {
                     Swal.close();
-                    modal.hide();
-                    Swal.fire('เรียบร้อย', 'แก้ไขข้อมูลการจองเรียบร้อย', 'success');
-                    loadAdminData();
-                    loadDashboard();
+                    if (res.status === "success") {
+                        modal.hide();
+                        Swal.fire('เรียบร้อย', 'แก้ไขข้อมูลการจองเรียบร้อย', 'success');
+                        loadAdminData();
+                        loadDashboard();
+                    } else {
+                        Swal.fire('แก้ไขไม่สำเร็จ', res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+                    }
                 });
             });
         }
