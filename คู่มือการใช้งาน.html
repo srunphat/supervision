@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือการใช้งานระบบนิเทศภายใน โรงเรียนวัดบ้านดาบ</title>
+    <!-- Google Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #F4F8FA;
+            color: #37474F;
+            padding: 30px 15px;
+        }
+        .manual-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header-title {
+            color: #2196F3;
+            font-weight: 700;
+        }
+        .role-table th {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .badge-info-custom {
+            background-color: #FFFDE7;
+            border-left: 5px solid #FBC02D;
+            color: #5D4037;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .badge-warning-custom {
+            background-color: #FFEBEE;
+            border-left: 5px solid #EF5350;
+            color: #7f2321;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .step-list {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        @media print {
+            body {
+                background-color: #FFFFFF;
+                padding: 0;
+            }
+            .manual-card {
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="manual-card">
+        <div class="text-center mb-4">
+            <h1 class="header-title mb-2"><i class="bi bi-book-half me-2"></i>คู่มือการใช้งานระบบนิเทศภายใน</h1>
+            <h4 class="text-muted">โรงเรียนวัดบ้านดาบ</h4>
+            <p class="text-secondary">ระบบบริหารจัดการงานวิชาการและการนิเทศการสอนแบบครบวงจร (จัดทำหน้าเดียวพร้อมใช้งาน)</p>
+            <button class="btn btn-outline-primary btn-sm mt-2 no-print" onclick="window.print()"><i class="bi bi-printer-fill me-1"></i> สั่งพิมพ์คู่มือนี้เป็นกระดาษหรือ PDF</button>
+        </div>
+
+        <hr>
+
+        <!-- Section: Key Passwords -->
+        <div class="row g-3 my-2">
+            <div class="col-md-6">
+                <div class="badge-warning-custom">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-shield-lock-fill me-2"></i>รหัสผ่านเข้าหน้าควบคุม (Admin)</h5>
+                    <p class="mb-0 fs-5 fw-bold text-center">รหัสผ่านคือ: <span class="badge bg-danger text-white fs-5">557889</span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="badge-info-custom">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-database-fill-check me-2"></i>ตำแหน่งจัดเก็บข้อมูล</h5>
+                    <p class="mb-0 small"><strong>ข้อมูลทั้งหมด:</strong> ซิงค์ลง Google Sheets แบบอัตโนมัติ<br><strong>ไฟล์และภาพถ่ายห้องเรียน:</strong> อัปโหลดไปจัดเก็บลง Google Drive</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Steps -->
+        <h4 class="fw-bold my-4 text-dark"><i class="bi bi-people-fill text-primary me-2"></i>บทบาทและขั้นตอนการทำงาน</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 33%">🧑‍🏫 1. ครูผู้รับการนิเทศ</th>
+                        <th style="width: 33%">📝 2. ผู้นิเทศ (ผอ. / หัวหน้าวิชาการ)</th>
+                        <th style="width: 34%">🔑 3. ผู้ดูแลระบบ (Admin)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td valign="top" class="p-3">
+                            <h6 class="fw-bold text-primary">ขั้นตอนที่ 1: จองวันนิเทศ</h6>
+                            <ol class="step-list">
+                                <li>ไปที่แท็บ <strong>"จองวันนิเทศ"</strong></li>
+                                <li>ป้อนชื่อตัว-ชื่อสกุล, กลุ่มสาระฯ, วิชาที่สอน, รหัสวิชา, ชั้นเรียน และเลือกวันที่รวมถึงคาบเรียน</li>
+                                <li>คลิกยืนยันจองสิทธิ์</li>
+                            </ol>
+                            <h6 class="fw-bold text-primary mt-3">ขั้นตอนที่ 2: ส่งงานการนิเทศ</h6>
+                            <ol class="step-list">
+                                <li>ไปที่แท็บ <strong>"ส่งงาน/แผนการสอน"</strong></li>
+                                <li>อัปโหลดไฟล์แผนการสอน (PDF/Word)</li>
+                                <li>แนบไฟล์สื่อการสอน (ถ้ามี)</li>
+                                <li>อัปโหลดรูปภาพห้องเรียน 4 รูปตามหัวข้อ</li>
+                                <li>กดส่งข้อมูล (ไฟล์จะเข้าระบบ Drive)</li>
+                            </ol>
+                        </td>
+                        <td valign="top" class="p-3">
+                            <h6 class="fw-bold text-success">ขั้นตอนที่ 1: ลงคะแนนตรวจ</h6>
+                            <ol class="step-list">
+                                <li>ไปที่แท็บ <strong>"ประเมินผล"</strong></li>
+                                <li>เลือกรายชื่อคุณครูที่จองคิวไว้</li>
+                                <li>ป้อนวันที่เริ่มลงมือประเมิน</li>
+                            </ol>
+                            <h6 class="fw-bold text-success mt-3">ขั้นตอนที่ 2: ประเมินเกณฑ์ 16 ข้อ</h6>
+                            <ol class="step-list">
+                                <li>ให้ระดับคะแนน (1-5 คะแนน) ในแต่ละด้าน (สภาพห้องเรียน / พฤติกรรมครู / พฤติกรรมนักเรียน)</li>
+                                <li>ระบบคำนวณและวัดระดับผลคะแนนอัตโนมัติ</li>
+                                <li>กรอกบันทึกจุดเด่นและจุดเสนอแนะเพิ่มเติม</li>
+                                <li>กดส่งบันทึกผลงาน (สถานะคุณครูจะอัปเดตเป็นผ่านการตรวจทันที)</li>
+                            </ol>
+                        </td>
+                        <td valign="top" class="p-3">
+                            <h6 class="fw-bold text-danger">ขั้นตอนที่ 1: ตรวจคิวงานและอนุมัติ</h6>
+                            <ol class="step-list">
+                                <li>ไปที่แท็บ <strong>"ผู้ดูแลระบบ"</strong> ป้อนรหัสผ่าน <strong>557889</strong></li>
+                                <li>ในหน้า <strong>"จัดการรายการจอง"</strong> กดอนุมัติคิวที่จองเข้ามา</li>
+                                <li>ในหน้า <strong>"ตรวจสอบงานส่ง"</strong> ตรวจเช็คแผนการสอนและภาพถ่ายที่อัปโหลด</li>
+                            </ol>
+                            <h6 class="fw-bold text-danger mt-3">ขั้นตอนที่ 2: บริหารงานเอกสาร (A4)</h6>
+                            <ol class="step-list">
+                                <li>ในหน้า <strong>"รายงานสรุปและการพิมพ์"</strong>:</li>
+                                <li><strong>พิมพ์ผลสรุปกลุ่มสาระฯ:</strong> เลือกระบุกลุ่มสาระที่ต้องการ แล้วกดพิมพ์ใบรายงาน A4</li>
+                                <li><strong>พิมพ์เกียรติบัตรรายบุคคล:</strong> เลือกรายชื่อคุณครูที่ประเมินแล้ว เพื่อพิมพ์ใบรับรองเกียรติบัตรและรายละเอียดคะแนนแนบท้าย</li>
+                            </ol>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-5 text-muted small">
+            <p class="mb-0">© ระบบการนิเทศโรงเรียนวัดบ้านดาบ | ปรับแต่งรูปแบบการแสดงผลตามความต้องการล่าสุด</p>
+        </div>
+    </div>
+
+</body>
+</html>

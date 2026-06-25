@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการนิเทศภายในโรงเรียนวัดบ้านดาบ</title>
+    
+    <!-- Google Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    
+    <!-- Resource error tracker -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+                alert("ไฟล์ระบบดาวน์โหลดไม่สำเร็จ (อาจโดนเครือข่ายบล็อก): " + (e.target.src || e.target.href));
+            }
+        }, true);
+    </script>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs5/1.13.7/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.1/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --pastel-blue-bg: #F4F8FA;
+            --pastel-blue: #E3F2FD;
+            --pastel-blue-dark: #2196F3;
+            --pastel-yellow: #FFFDE7;
+            --pastel-yellow-dark: #FBC02D;
+            --pastel-green: #E8F5E9;
+            --pastel-green-dark: #4CAF50;
+            --pastel-pink: #FFEBEE;
+            --pastel-pink-dark: #EF5350;
+            --text-dark: #37474F;
+            --navbar-bg: #FFFFFF;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--pastel-blue-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar & Header Customizations */
+        .navbar-custom {
+            background-color: var(--navbar-bg);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            border-bottom: 2px solid var(--pastel-blue);
+            transition: var(--transition-speed);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--pastel-blue-dark) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link-custom {
+            font-weight: 500;
+            color: var(--text-dark);
+            border-radius: 8px;
+            padding: 8px 16px !important;
+            margin: 0 4px;
+            transition: var(--transition-speed);
+        }
+
+        .nav-link-custom:hover {
+            background-color: var(--pastel-blue);
+            color: var(--pastel-blue-dark);
+        }
+
+        .nav-link-custom.active {
+            background-color: var(--pastel-blue-dark) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* Cards and Sections */
+        .card-custom {
+            background: #FFFFFF;
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            overflow: hidden;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card {
+            border-left: 5px solid;
+            padding: 24px;
+        }
+        .stat-card.blue { border-left-color: var(--pastel-blue-dark); background-color: var(--pastel-blue); }
+        .stat-card.green { border-left-color: var(--pastel-green-dark); background-color: var(--pastel-green); }
+        .stat-card.yellow { border-left-color: var(--pastel-yellow-dark); background-color: var(--pastel-yellow); }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        /* Tables & Typography */
+        .table-custom-wrapper {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        #tbl-latest-bookings, #tbl-latest-submissions {
+            font-size: 0.82rem; /* ลดขนาดตัวอักษรลงตามที่แจ้ง */
+        }
+        #tbl-latest-bookings th, #tbl-latest-bookings td,
+        #tbl-latest-submissions th, #tbl-latest-submissions td {
+            white-space: nowrap; /* แสดงผลบรรทัดเดียว ไม่ขึ้นบรรทัดใหม่ */
+            padding: 8px 10px;   /* ปรับระยะห่างให้กระชับยิ่งขึ้น */
+        }
+
+        thead {
+            background-color: var(--pastel-blue);
+        }
+
+        /* Custom Buttons */
+        .btn-primary-custom {
+            background-color: var(--pastel-blue-dark);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: var(--transition-speed);
+        }
+        .btn-primary-custom:hover {
+            background-color: #1e88e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Custom forms */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid #E0E0E0;
+            padding: 11px 16px;
+            transition: var(--transition-speed);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--pastel-blue-dark);
+            box-shadow: 0 0 0 0.25rem rgba(33, 150, 243, 0.15);
+        }
+
+        /* Score radio buttons styling */
+        .score-btn-group .btn-check:checked + .btn {
+            background-color: var(--pastel-blue-dark) !important;
+            color: white !important;
+            border-color: var(--pastel-blue-dark) !important;
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+            font-weight: 700;
+        }
+        .score-btn-group .btn {
+            border-color: #D6D6D6;
+            transition: all 0.2s;
+        }
+
+        /* FullCalendar Custom styling */
+        #calendar {
+            background: #FFFFFF;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .fc-header-toolbar {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #FFFFFF;
+            border-top: 1px solid var(--pastel-blue);
+            color: #78909C;
+            padding: 20px 0;
+            margin-top: auto;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* System modes badge */
+        .mode-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* A4 Printing Layouts */
+        @media print {
+            body {
+                background-color: #FFFFFF;
+                color: #000000;
+                font-size: 13pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                display: none !important;
+            }
+            .print-container.active-print {
+                display: block !important;
+                width: 100%;
+                margin: 0;
+                padding: 1cm;
+                box-shadow: none;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+        }
+
+        .print-container {
+            display: none;
+            background: white;
+            color: black;
+        }
+
+        .evaluation-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .bg-verygood { background-color: var(--pastel-green); color: var(--pastel-green-dark); }
+        .bg-good { background-color: var(--pastel-blue); color: var(--pastel-blue-dark); }
+        .bg-fair { background-color: var(--pastel-yellow); color: var(--pastel-yellow-dark); }
+        .bg-poor { background-color: var(--pastel-pink); color: var(--pastel-pink-dark); }
+
+        .eval-card {
+            min-width: 280px;
+            max-width: 280px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            border-top: 4px solid var(--pastel-blue-dark);
+        }
+
+        /* Styles for Admin view */
+        .admin-login-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Console Output on Screen -->
+    <div id="debug-log-panel" style="background: #212121; color: #FFEB3B; padding: 15px; font-family: monospace; font-size: 13px; border-bottom: 3px solid #FF1744; z-index: 99999; position: relative; text-align: left;">
+        <h4 style="margin: 0 0 10px 0; color: #FFF; font-weight: bold;">Console Error Debugger (หน้าต่างค้นหาข้อผิดพลาด):</h4>
+        <div id="debug-log-content" style="white-space: pre-wrap; max-height: 150px; overflow-y: auto; line-height: 1.5;">ระบบติดตามข้อผิดพลาดกำลังทำงาน... (หากระบบปกติ ข้อความนี้จะหายไปเมื่อโหลดเสร็จ)</div>
+    </div>
+    <script>
+        (function() {
+            var panel = document.getElementById('debug-log-panel');
+            var content = document.getElementById('debug-log-content');
+            var hasError = false;
+            function logToScreen(msg) {
+                if (!hasError) {
+                    content.innerText = "";
+                    hasError = true;
+                }
+                panel.style.background = '#310000';
+                content.innerText += msg + '\n';
+            }
+            window.onerror = function(message, source, lineno, colno, error) {
+                logToScreen("❌ JS ERROR: " + message + "\n   บรรทัดที่: " + lineno + "\n   ไฟล์: " + source);
+                return false;
+            };
+            var originalConsoleError = console.error;
+            console.error = function() {
+                var args = Array.prototype.slice.call(arguments);
+                logToScreen("⚠️ CONSOLE ERROR: " + args.join(' '));
+                originalConsoleError.apply(console, arguments);
+            };
+            // Hide debugger if no errors after 3 seconds and page started loading
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    if (!hasError && typeof window.jQuery !== 'undefined' && typeof bootstrap !== 'undefined') {
+                        panel.style.display = 'none';
+                    }
+                }, 1500);
+            });
+        })();
+    </script>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom sticky-top no-print">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <!-- Logo Container -->
+                <div id="school-logo-container" class="d-flex align-items-center">
+                    <!-- Default SVG crest dynamically inserted if CONFIG.LOGO_URL is blank -->
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                    <span style="font-size: 1.15rem; line-height: 1.2;">ระบบการนิเทศภายในโรงเรียนวัดบ้านดาบ</span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom active" id="tab-dashboard" href="#" onclick="switchTab('dashboard')">
+                            <i class="bi bi-speedometer2 me-1"></i> หน้าแรก
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" id="tab-booking" href="#" onclick="switchTab('booking')">
+                            <i class="bi bi-calendar-event me-1"></i> จองวันนิเทศ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" id="tab-upload" href="#" onclick="switchTab('upload')">
+                            <i class="bi bi-cloud-upload me-1"></i> ส่งงาน/แผนการสอน
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" id="tab-supervision" href="#" onclick="switchTab('supervision')">
+                            <i class="bi bi-file-earmark-check me-1"></i> ประเมินผล
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" id="tab-admin" href="#" onclick="switchTab('admin')">
+                            <i class="bi bi-shield-lock me-1"></i> ผู้ดูแลระบบ
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                        <span id="db-status-badge" class="badge mode-badge bg-warning text-dark">
+                            <i class="bi bi-database-fill-exclamation me-1"></i> กำลังโหลด...
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container my-4 flex-grow-1 no-print">
+
+        <!-- ================= TAB 1: DASHBOARD ================= -->
+        <section id="sect-dashboard" class="tab-content-item">
+            <!-- Stat Cards Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card-custom stat-card blue d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted">จำนวนผู้จองทั้งหมด</h6>
+                            <h2 class="fw-bold mb-0" id="stat-total-bookings">0</h2>
+                        </div>
+                        <i class="bi bi-journal-bookmark-fill text-primary stat-icon"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-custom stat-card green d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted">จำนวนที่นิเทศแล้ว</h6>
+                            <h2 class="fw-bold mb-0" id="stat-total-supervised">0</h2>
+                        </div>
+                        <i class="bi bi-check-circle-fill text-success stat-icon"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-custom stat-card yellow d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted">จำนวนผู้ส่งงาน</h6>
+                            <h2 class="fw-bold mb-0" id="stat-total-submissions">0</h2>
+                        </div>
+                        <i class="bi bi-file-earmark-arrow-up-fill text-warning stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar & Supervision Feed Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card-custom p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar3 me-2 text-primary"></i>ปฏิทินการจองวันนิเทศ</h5>
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card-custom p-4 h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-star-fill me-2 text-warning"></i>ผลการนิเทศล่าสุด (5 รายการ)</h5>
+                        <div id="evaluations-scroller" class="d-flex flex-column gap-3 overflow-y-auto" style="max-height: 480px;">
+                            <!-- Dynamic Content -->
+                            <div class="text-muted text-center py-4">ไม่พบข้อมูลการประเมิน</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="table-custom-wrapper">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-table me-2 text-primary"></i>รายการจองล่าสุด</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle w-100" id="tbl-latest-bookings">
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">ชื่อครู</th>
+                                        <th class="text-nowrap">วิชา</th>
+                                        <th class="text-nowrap">วัน-เวลา</th>
+                                        <th class="text-nowrap">สถานะ</th>
+                                        <th class="text-nowrap text-center">การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="table-custom-wrapper">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-check me-2 text-success"></i>สถานะการส่งงานล่าสุด</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle w-100" id="tbl-latest-submissions">
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">ชื่อครู</th>
+                                        <th class="text-nowrap">ไฟล์แผนการสอน</th>
+                                        <th class="text-nowrap">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: BOOKING ================= -->
+        <section id="sect-booking" class="tab-content-item d-none">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card-custom p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-calendar-check-fill text-primary" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mt-2">จองวันนิเทศภายใน</h3>
+                            <p class="text-muted">กรอกข้อมูลเพื่อจองสิทธิ์วันและคาบเวลาสำหรับการรับการนิเทศภายใน</p>
+                        </div>
+                        <form id="form-booking" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">ชื่อ-นามสกุล ครูผู้รับการนิเทศ <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="teacherName" placeholder="เช่น นายสมชาย ใจดี" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">กลุ่มสาระการเรียนรู้ <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="department" required>
+                                        <option value="" disabled selected>-- เลือกกลุ่มสาระฯ --</option>
+                                        <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                                        <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                                        <option value="ภาษาไทย">ภาษาไทย</option>
+                                        <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                                        <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษา ศาสนา และวัฒนธรรม</option>
+                                        <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                                        <option value="ศิลปะ">ศิลปะ</option>
+                                        <option value="การงานอาชีพ">การงานอาชีพ</option>
+                                        <option value="ปฐมวัย">ปฐมวัย</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">วันที่ต้องการนิเทศ <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="date" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">เวลาที่นิเทศ <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" name="time" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">คาบเรียนที่ <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="period" required>
+                                        <option value="" disabled selected>-- คาบเรียน --</option>
+                                        <option value="1">คาบที่ 1</option>
+                                        <option value="2">คาบที่ 2</option>
+                                        <option value="3">คาบที่ 3</option>
+                                        <option value="4">คาบที่ 4</option>
+                                        <option value="5">คาบที่ 5</option>
+                                        <option value="6">คาบที่ 6</option>
+                                        <option value="7">คาบที่ 7</option>
+                                        <option value="8">คาบที่ 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">ชื่อวิชา <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="subject" placeholder="เช่น วิทยาการคำนวณ" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">รหัสวิชา <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="subjectCode" placeholder="เช่น ว21103" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">ชั้น/ห้อง <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="classRoom" placeholder="เช่น ม.1/1" required>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <button type="submit" class="btn-primary-custom w-100 py-3"><i class="bi bi-save me-2"></i>บันทึกการจองวันนิเทศ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: UPLOAD ================= -->
+        <section id="sect-upload" class="tab-content-item d-none">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card-custom p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-cloud-arrow-up-fill text-success" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mt-2">ส่งงานและแผนการสอน</h3>
+                            <p class="text-muted">กรอกข้อมูลและอัปโหลดไฟล์สำหรับรับการนิเทศ (ไฟล์จะถูกจัดเก็บในระบบ Google Drive)</p>
+                        </div>
+                        <form id="form-upload" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">ชื่อ-นามสกุล ครูผู้ส่งงาน <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="teacherName" placeholder="กรุณาระบุชื่อ-นามสกุลเดิมที่จองไว้" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">แผนการสอน (ไฟล์ PDF/DOCX)</label>
+                                    <input type="file" class="form-control" name="planFile" accept=".pdf,.docx,.doc">
+                                    <div class="form-text">อัปโหลดไฟล์แผนที่จะใช้รับการนิเทศ (อัปโหลดก่อนวันนิเทศ)</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">สื่อการเรียนการสอน (ไฟล์ PowerPoint/PDF/ZIP/ลิงก์)</label>
+                                    <input type="file" class="form-control" name="mediaFile" accept=".pdf,.ppt,.pptx,.zip,.rar">
+                                    <div class="form-text">อัปโหลดสื่อหลักหรือไฟล์ประกอบการเรียนการสอน (ถ้ามี)</div>
+                                </div>
+                                
+                                <div class="col-12 mt-3">
+                                    <h6 class="fw-bold border-bottom pb-2">อัปโหลดภาพกิจกรรมการจัดการเรียนการสอน (4 รูปภาพ) <span class="text-muted fs-6 font-normal fw-normal">(อัปโหลดหลังเสร็จสิ้นการนิเทศ)</span></h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">รูปภาพที่ 1: บรรยากาศห้องเรียน</label>
+                                    <input type="file" class="form-control" name="image1" accept="image/*">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">รูปภาพที่ 2: การทำกิจกรรมของนักเรียน</label>
+                                    <input type="file" class="form-control" name="image2" accept="image/*">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">รูปภาพที่ 3: สื่อ/ชิ้นงาน หรือใบงานนักเรียน</label>
+                                    <input type="file" class="form-control" name="image3" accept="image/*">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">รูปภาพที่ 4: ครูผู้สอนขณะจัดกิจกรรม</label>
+                                    <input type="file" class="form-control" name="image4" accept="image/*">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 text-center">
+                                <button type="submit" class="btn-primary-custom w-100 py-3"><i class="bi bi-send-check me-2"></i>อัปโหลดและส่งงาน</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: SUPERVISION ================= -->
+        <section id="sect-supervision" class="tab-content-item d-none">
+            <div class="row justify-content-center">
+                <div class="col-md-9">
+                    <div class="card-custom p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-clipboard-check-fill text-danger" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mt-2">ประเมินผลการจัดกิจกรรมการเรียนรู้</h3>
+                            <p class="text-muted">โดยกรอกคะแนนและข้อเสนอแนะในการจัดการเรียนการสอน</p>
+                        </div>
+                        <form id="form-supervision" class="needs-validation" novalidate>
+                            
+                            <!-- Teacher Details Selection -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">เลือกครูผู้รับการนิเทศ <span class="text-danger">*</span></label>
+                                    <select class="form-select shadow-sm" id="eval-teacher-select" name="teacherName" required>
+                                        <option value="" disabled selected>-- เลือกชื่อครูจากรายการจอง --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">วันที่ประเมินนิเทศ <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control shadow-sm" name="date" required>
+                                </div>
+                            </div>
+
+                            <!-- Evaluation Criteria Section (16 Items) -->
+                            <div class="row">
+                                <!-- Section 1: Classroom Condition -->
+                                <div class="col-12 mb-4">
+                                    <div class="card border-0 shadow-sm p-4" style="background: #FFFDE7; border-radius: 12px;">
+                                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-house-door-fill text-warning me-2"></i>หัวข้อที่ 1: สภาพห้องเรียน</h5>
+                                        <div id="criteria-classroom-container" class="d-flex flex-column gap-3">
+                                            <!-- Dynamic render -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Section 2: Teacher Behavior -->
+                                <div class="col-12 mb-4">
+                                    <div class="card border-0 shadow-sm p-4" style="background: #E8F5E9; border-radius: 12px;">
+                                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-badge-fill text-success me-2"></i>หัวข้อที่ 2: พฤติกรรมของครู</h5>
+                                        <div id="criteria-teacher-container" class="d-flex flex-column gap-3">
+                                            <!-- Dynamic render -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Section 3: Student Behavior -->
+                                <div class="col-12 mb-4">
+                                    <div class="card border-0 shadow-sm p-4" style="background: #E3F2FD; border-radius: 12px;">
+                                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-people-fill text-primary me-2"></i>หัวข้อที่ 3: พฤติกรรมของนักเรียน</h5>
+                                        <div id="criteria-student-container" class="d-flex flex-column gap-3">
+                                            <!-- Dynamic render -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Real-time Score Results Panel -->
+                            <div class="card border border-primary p-4 mb-4" style="background-color: var(--pastel-blue); border-radius: 12px;">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-6 text-center text-md-start">
+                                        <h5 class="fw-bold mb-1 text-primary">สรุปผลการประเมินการนิเทศ</h5>
+                                        <p class="text-muted mb-0" style="font-size: 0.85rem;">ระบบจะเฉลี่ยคะแนนให้ท่านโดยอัตโนมัติ (คะแนนเต็ม 5)</p>
+                                    </div>
+                                    <div class="col-md-6 text-center text-md-end">
+                                        <div class="d-inline-block p-2 bg-white rounded-3 shadow-sm border border-light">
+                                            <span class="fs-6 text-muted me-2">คะแนนเฉลี่ย:</span>
+                                            <span id="eval-avg-score-badge" class="fs-3 fw-bold text-dark">0.00</span>
+                                            <span id="eval-rating-badge" class="evaluation-badge bg-poor ms-2">รอประเมินครู</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Text Area Comments -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">จุดเด่นที่พบเห็นในการสอน <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="strengths" rows="3" placeholder="ระบุสิ่งที่ครูทำได้ดีเป็นพิเศษ..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">จุดที่ควรพัฒนาเพิ่มเติม <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="improvement" rows="3" placeholder="ระบุประเด็นที่แนะนำให้ครูปรับปรุงเพิ่มเติม..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">ข้อเสนอแนะทั่วไป/ข้อคิดเห็นอื่นๆ</label>
+                                    <textarea class="form-control" name="suggestions" rows="2" placeholder="กรอกข้อเสนอแนะประกอบการทำงานเพิ่มเติม..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn-primary-custom w-100 py-3"><i class="bi bi-bookmark-heart-fill me-2"></i>ส่งบันทึกและประเมินผลการนิเทศ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 5: ADMIN ================= -->
+        <section id="sect-admin" class="tab-content-item d-none position-relative" style="min-height: 400px;">
+            
+            <!-- Login Overlay (Shows if not authorized) -->
+            <div id="admin-login-box" class="admin-login-overlay">
+                <div class="card p-4 text-center shadow-lg border-0" style="max-width: 400px; width:100%;">
+                    <i class="bi bi-shield-lock-fill text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h4 class="fw-bold">เข้าสู่ระบบผู้ดูแลระบบ</h4>
+                    <p class="text-muted">กรอกรหัสผ่านเพื่อสิทธิ์การจัดการระบบและพิมพ์รายงาน</p>
+                    <div class="mb-3">
+                        <input type="password" id="admin-password-input" class="form-control text-center" placeholder="ป้อนรหัสผ่านผู้ดูแลระบบ">
+                    </div>
+                    <button type="button" class="btn btn-warning w-100 py-2 fw-bold text-dark" onclick="checkAdminPassword()"><i class="bi bi-unlock me-2"></i>ยืนยันรหัสผ่าน</button>
+                </div>
+            </div>
+
+            <!-- Admin Area (Hidden by default, shown after login) -->
+            <div id="admin-content-box" class="d-none">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0 text-primary"><i class="bi bi-sliders me-2"></i>แผงจัดการผู้ดูแลระบบ (Admin)</h3>
+                    <div>
+                        <button class="btn btn-danger btn-sm" onclick="logoutAdmin()"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+                    </div>
+                </div>
+
+                <!-- Admin Action Tabs (Nested) -->
+                <ul class="nav nav-pills mb-4" id="admin-subtabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active me-2" id="subtab-bookings" data-bs-toggle="pill" data-bs-target="#admin-bookings-tab" type="button" role="tab"><i class="bi bi-calendar3 me-1"></i> จัดการรายการจอง</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link me-2" id="subtab-submissions" data-bs-toggle="pill" data-bs-target="#admin-submissions-tab" type="button" role="tab"><i class="bi bi-file-earmark-arrow-up me-1"></i> ตรวจสอบงานส่ง</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="subtab-reports" data-bs-toggle="pill" data-bs-target="#admin-reports-tab" type="button" role="tab"><i class="bi bi-printer me-1"></i> รายงานสรุปและการพิมพ์</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="admin-subtab-content">
+                    
+                    <!-- Admin Tab 1: Manage Bookings -->
+                    <div class="tab-pane fade show active" id="admin-bookings-tab" role="tabpanel">
+                        <div class="table-custom-wrapper">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                <h5 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2"></i>จัดการการจองนิเทศทั้งหมด</h5>
+                                <button class="btn btn-success text-white btn-sm" onclick="openAddBookingModal()"><i class="bi bi-plus-lg me-1"></i>เพิ่มการจองใหม่</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle w-100" id="tbl-admin-bookings">
+                                    <thead>
+                                        <tr>
+                                            <th>วันที่ส่งจอง</th>
+                                            <th>ชื่อครู</th>
+                                            <th>กลุ่มสาระฯ</th>
+                                            <th>วิชา (รหัส)</th>
+                                            <th>วัน-เวลาที่จอง</th>
+                                            <th>ห้อง/คาบ</th>
+                                            <th>สถานะ</th>
+                                            <th>การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Tab 2: Submissions Check -->
+                    <div class="tab-pane fade" id="admin-submissions-tab" role="tabpanel">
+                        <div class="table-custom-wrapper">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-arrow-up-fill me-2"></i>ตรวจสอบเอกสารแผนและสื่อของครู</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle w-100" id="tbl-admin-submissions">
+                                    <thead>
+                                        <tr>
+                                            <th>วันที่ส่งงาน</th>
+                                            <th>ชื่อครูผู้ส่ง</th>
+                                            <th>ไฟล์แผนการสอน</th>
+                                            <th>ไฟล์สื่อการสอน</th>
+                                            <th>รูปบรรยากาศการสอน (4 รูป)</th>
+                                            <th>สถานะตรวจ</th>
+                                            <th>การประเมินผ่านงาน</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Tab 3: Summary Reports & Printing -->
+                    <div class="tab-pane fade" id="admin-reports-tab" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card p-4 h-100" style="border-radius: 12px; border: 1.5px solid var(--pastel-blue-dark);">
+                                    <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-file-earmark-bar-graph me-2"></i>1. รายงานผลสรุปตามกลุ่มสาระฯ (A4 PDF)</h5>
+                                    <p class="text-muted" style="font-size:0.9rem;">พิมพ์รายงานสรุปภาพรวมรายชื่อครู วันรับนิเทศ และระดับผลประเมินเฉลี่ย โดยสามารถเลือกกรองตามกลุ่มสาระฯ ได้</p>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">เลือกกลุ่มสาระการเรียนรู้</label>
+                                        <select class="form-select" id="report-dept-select">
+                                            <option value="ทั้งหมด">ทั้งหมดทุกกลุ่มสาระฯ</option>
+                                            <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                                            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                                            <option value="ภาษาไทย">ภาษาไทย</option>
+                                            <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                                            <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษา ศาสนา และวัฒนธรรม</option>
+                                            <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                                            <option value="ศิลปะ">ศิลปะ</option>
+                                            <option value="การงานอาชีพ">การงานอาชีพ</option>
+                                            <option value="ปฐมวัย">ปฐมวัย</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-primary-custom py-2" onclick="printDepartmentSummary()"><i class="bi bi-file-earmark-pdf me-2"></i>จัดทำและเปิดหน้าพิมพ์ A4</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card p-4 h-100" style="border-radius: 12px; border: 1.5px solid var(--pastel-green);">
+                                    <h5 class="fw-bold mb-3 text-success"><i class="bi bi-award me-2"></i>2. พิมพ์ใบรับรองผลรายบุคคล (Certificate)</h5>
+                                    <p class="text-muted" style="font-size:0.9rem;">สร้างเกียรติบัตรรับรองผลการรับการนิเทศพร้อมรายละเอียดคะแนนทั้ง 16 ข้อ เพื่อมอบให้ครูผู้รับนิเทศ</p>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">เลือกชื่อครูรับการประเมิน</label>
+                                        <select class="form-select" id="report-teacher-select">
+                                            <option value="" disabled selected>-- โหลดรายชื่อครูที่มีคะแนนแล้ว --</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-success py-2 text-white w-100" style="border-radius:10px;" onclick="printIndividualCertificate()"><i class="bi bi-printer-fill me-2"></i>เปิดพิมพ์ใบรับรองเกียรติบัตร A4</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Area -->
+    <footer class="no-print">
+        <div class="container">
+            <p class="mb-1">&copy; 2026 ระบบการนิเทศโรงเรียนวัดบ้านดาบ | พัฒนาโดย ผอ.ศรัณย์ภัทร สุดหล่อ</p>
+            <small class="text-muted">ใช้เฉพาะระบบงานบริหารวิชาการโรงเรียนวัดบ้านดาบเท่านั้น เป็นลิขสิทธิ์ของ ผอ.ศรัณย์ภัทร สุดหล่อ</small>
+        </div>
+    </footer>
+
+    <!-- ========================================================== -->
+    <!-- PRINT LAYOUT (A4 SUMMARY) - HIDDEN ON SCREEN, SHOWN ON PRINT -->
+    <!-- ========================================================== -->
+    
+    <!-- 1. Print Summary Report (A4) -->
+    <div id="print-dept-summary" class="print-container">
+        <div class="text-center mb-4 position-relative">
+            <!-- Printable Logo Header -->
+            <div id="print-logo-summary" class="mb-2 text-center"></div>
+            <h3 class="fw-bold">รายงานผลสรุปการประเมินการนิเทศการสอนรายกลุ่มสาระ</h3>
+            <h5>โรงเรียนวัดบ้านดาบ สำนักงานเขตพื้นที่การศึกษาประถมศึกษาลพบุรี เขต 1</h5>
+            <p>กลุ่มสาระการเรียนรู้: <span id="print-summary-dept" class="fw-bold">ทั้งหมด</span> | รายงาน ณ วันที่: <span id="print-summary-date" class="fw-bold">--</span></p>
+        </div>
+        <table class="table table-bordered border-dark w-100 align-middle">
+            <thead class="text-center table-light border-dark">
+                <tr>
+                    <th style="width: 5%">ที่</th>
+                    <th style="width: 25%">ชื่อ-นามสกุล ครูรับการนิเทศ</th>
+                    <th style="width: 20%">วิชาที่สอน (รหัส)</th>
+                    <th style="width: 15%">วันที่รับนิเทศ</th>
+                    <th style="width: 15%">ผลประเมิน (เฉลี่ย)</th>
+                    <th style="width: 20%">ผู้นิเทศ / หมายเหตุ</th>
+                </tr>
+            </thead>
+            <tbody id="print-summary-tbody">
+                <!-- Dynamically filled -->
+            </tbody>
+        </table>
+        
+        <div class="row mt-5">
+            <div class="col-6 text-center">
+                <p style="white-space: nowrap;">ลงชื่อ..................................................<br>(นางสาวณัฏฐา จิตตเสถียร)<br>หัวหน้ากลุ่มบริหารวิชาการ</p>
+            </div>
+            <div class="col-6 text-center">
+                <p style="white-space: nowrap;">ลงชื่อ..................................................<br>(นายศรัณย์ภัทร กาญจนาคม)<br>ผู้อำนวยการโรงเรียนวัดบ้านดาบ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Print Individual Supervision Certificate (A4 - 2 Pages Layout) -->
+    <div id="print-indiv-cert" class="print-container">
+        <!-- Page 1: Certificate -->
+        <div style="border: 5px double #2196F3; padding: 20px 25px; text-align: center; border-radius: 10px; background: #fff; position: relative; min-height: 24cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-size: 16px;">
+            <div>
+                <div class="mb-2 text-center">
+                    <!-- Printable Logo Certificate -->
+                    <div id="print-logo-cert" class="d-inline-block" style="transform: scale(0.95); margin-bottom: 5px;"></div>
+                </div>
+                <h2 class="fw-bold text-primary mb-1" style="font-size: 26px;">ใบรับรองผลการรับการนิเทศภายใน</h2>
+                <h4 class="mb-3" style="font-size: 18px;">โรงเรียนวัดบ้านดาบ</h4>
+                <p class="mb-3" style="font-size: 16px;">เอกสารฉบับนี้ออกเพื่อรับรองว่า</p>
+                <h3 class="fw-bold my-2 text-dark" style="font-size: 28px; border-bottom: 2px solid #2196F3; display: inline-block; padding-bottom: 3px;"><span id="cert-teacher-name">--</span></h3>
+                <p class="mt-3 mb-3" style="font-size: 16px; line-height: 1.5;">ได้เข้ารับการนิเทศการจัดการเรียนการสอนและพัฒนางานวิชาการโรงเรียนวัดบ้านดาบ ประจำภาคเรียนที่ 1 ปีการศึกษา 2569</p>
+                
+                <div class="mt-2 p-2 rounded" style="background: #E3F2FD; display: inline-block; text-align: left; font-size: 15px; border-left: 5px solid #2196F3; width: 95%; box-sizing: border-box;">
+                    <p class="mb-1" style="line-height: 1.4;"><strong>รายวิชา:</strong> <span id="cert-subject">--</span> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>รหัสวิชา:</strong> <span id="cert-code">--</span> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>ชั้นเรียน:</strong> <span id="cert-class">--</span></p>
+                    <p class="mb-0" style="line-height: 1.4;"><strong>นิเทศเมื่อวันที่:</strong> <span id="cert-date">--</span> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>คะแนนเฉลี่ย:</strong> <span id="cert-avg-score" class="fw-bold text-primary">0.00</span> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>ระดับ:</strong> <span id="cert-rating" class="fw-bold text-success">--</span></p>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้รับการนิเทศ<br>( <span class="cert-teacher-name-sig">--</span> )</p>
+                </div>
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้นิเทศ<br>(นายศรัณย์ภัทร กาญจนาคม)<br>ผู้อำนวยการโรงเรียนวัดบ้านดาบ</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Page 2: Attachment (Detailed Ratings & Recommendations) -->
+        <div style="border: 2px solid #ccc; padding: 25px; border-radius: 10px; background: #fff; min-height: 24cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; margin-top: 0.5cm; font-size: 15px;">
+            <div>
+                <div class="text-center mb-3">
+                    <h3 class="fw-bold" style="font-size: 20px; margin-bottom: 5px;">เอกสารแนบท้ายใบรับรองผลการรับการนิเทศภายใน</h3>
+                    <h5 class="text-muted" style="font-size: 15px; margin-bottom: 5px;">รายละเอียดคะแนนประเมินและข้อเสนอแนะรายบุคคล</h5>
+                    <p class="mb-0" style="font-size: 15px;">ผู้รับการนิเทศ: <strong><span id="cert-teacher-name-page2">--</span></strong></p>
+                </div>
+                
+                <!-- Table showing detailed ratings of the 16 criteria -->
+                <div class="mt-2 mb-3">
+                    <h6 class="fw-bold text-start border-bottom pb-1" style="font-size: 15px;"><i class="bi bi-list-check me-2 text-primary"></i>รายละเอียดคะแนนรายข้อประเมิน (เกณฑ์ 5 ระดับ)</h6>
+                    <table class="table table-bordered border-dark table-sm w-100 align-middle text-start" style="font-size: 12px; margin-bottom: 10px;">
+                        <thead class="table-light text-center border-dark">
+                            <tr>
+                                <th>สภาพห้องเรียน (1-5)</th>
+                                <th style="width: 8%">คะแนน</th>
+                                <th>พฤติกรรมของครู (1-5)</th>
+                                <th style="width: 8%">คะแนน</th>
+                                <th>พฤติกรรมของนักเรียน (1-5)</th>
+                                <th style="width: 8%">คะแนน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cert-detailed-scores-tbody">
+                            <!-- Dynamic rendered list of scores -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="border p-2 rounded" style="background:#F9F9F9; font-size: 14px; line-height: 1.5;">
+                            <p class="mb-1"><strong>จุดเด่นที่สำคัญ:</strong> <span id="cert-strengths">--</span></p>
+                            <p class="mb-0"><strong>ประเด็นที่เสนอแนะพัฒนา:</strong> <span id="cert-improvement">--</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้รับการนิเทศ<br>( <span class="cert-teacher-name-sig">--</span> )</p>
+                </div>
+                <div class="col-6 text-center" style="font-size: 15px;">
+                    <p class="mb-0" style="white-space: nowrap;">ลงชื่อ.................................................. ผู้นิเทศ<br>(นายศรัณย์ภัทร กาญจนาคม)<br>ผู้อำนวยการโรงเรียนวัดบ้านดาบ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- MODALS SECTION -->
+    <!-- ========================================================== -->
+    
+    <!-- Modal: Add Booking (Admin) -->
+    <div class="modal fade" id="modal-add-booking" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-lg text-success me-2"></i>เพิ่มรายการจองใหม่ (นามแอดมิน)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-admin-add-booking" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="form-label">ชื่อครูผู้รับการนิเทศ <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="teacherName" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">กลุ่มสาระการเรียนรู้ <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department" required>
+                                    <option value="" disabled selected>-- เลือกกลุ่มสาระฯ --</option>
+                                    <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                                    <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                                    <option value="ภาษาไทย">ภาษาไทย</option>
+                                    <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                                    <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษา ศาสนา และวัฒนธรรม</option>
+                                    <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                                    <option value="ศิลปะ">ศิลปะ</option>
+                                    <option value="การงานอาชีพ">การงานอาชีพ</option>
+                                    <option value="ปฐมวัย">ปฐมวัย</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">วันที่นิเทศ <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="date" required>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">เวลา <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" name="time" required>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">คาบเรียน <span class="text-danger">*</span></label>
+                                <input type="number" min="1" max="8" class="form-control" name="period" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">ชื่อวิชา <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="subject" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">รหัสวิชา <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="subjectCode" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">ชั้น/ห้อง <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="classRoom" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-success">ยืนยันเพิ่มการจอง</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Booking (Admin) -->
+    <div class="modal fade" id="modal-edit-booking" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i>แก้ไขรายการจองนิเทศ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-admin-edit-booking" class="needs-validation" novalidate>
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="rowNum">
+                    <div class="modal-body">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="form-label">ชื่อครูผู้รับการนิเทศ <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="teacherName" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">กลุ่มสาระการเรียนรู้ <span class="text-danger">*</span></label>
+                                <select class="form-select" name="department" required>
+                                    <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                                    <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                                    <option value="ภาษาไทย">ภาษาไทย</option>
+                                    <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                                    <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษา ศาสนา และวัฒนธรรม</option>
+                                    <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                                    <option value="ศิลปะ">ศิลปะ</option>
+                                    <option value="การงานอาชีพ">การงานอาชีพ</option>
+                                    <option value="ปฐมวัย">ปฐมวัย</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">วันที่นิเทศ <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="date" required>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">เวลา <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" name="time" required>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">คาบเรียน <span class="text-danger">*</span></label>
+                                <input type="number" min="1" max="8" class="form-control" name="period" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">ชื่อวิชา <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="subject" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">รหัสวิชา <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="subjectCode" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">ชั้น/ห้อง <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="classRoom" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================== -->
+    <!-- SCRIPTS AND LIBRARIES -->
+    <!-- ========================================================== -->
+    
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (Google CDN) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.13.7/jquery.dataTables.min.js"></script>
+    <!-- DataTables Bootstrap 5 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs5/1.13.7/dataTables.bootstrap5.min.js"></script>
+    <!-- FullCalendar Bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Firebase Compat App & Auth CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-auth-compat.js"></script>
+
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            alert("ข้อผิดพลาดระบบ (JS Error): " + message + " ที่บรรทัด " + lineno + " (คอลัมน์ " + colno + ")");
+            return false;
+        };
+
+        // ========================================================
+        // APPLICATION CONFIGURATION
+        // ========================================================
+        const CONFIG = {
+            // ลิงก์เว็บแอป (Web App URL) ที่ก๊อปปี้มาจาก Google Apps Script หลังการ Deploy (ห้ามใส่ ID ชีตที่นี่)
+            API_URL: "https://script.google.com/macros/s/AKfycbzrT1hZeCjMM581PuYyxV-VbvvC0R4PO-IAdnjqV3JdG6WfkGgEl6b09LN1FBOz7UM/exec",
+            
+            // ตั้งค่า URL ของรูปภาพโลโก้โรงเรียนวัดบ้านดาบ
+            LOGO_URL: "https://lh3.googleusercontent.com/d/1pNHnnz-w_UN2fZS7pSeZgMUlmAha5lzi",
+
+            // ตั้งค่า Firebase Credentials ที่นี่
+            FIREBASE: {
+                apiKey: "",
+                authDomain: "",
+                projectId: "",
+                storageBucket: "",
+                messagingSenderId: "",
+                appId: ""
+            }
+        };
+
+        // แบบรายการการประเมิน 16 ข้อ
+        const EVAL_ITEMS = [
+            { id: "room1", category: "สภาพห้องเรียน", text: "1. ห้องเรียนสะอาด เรียบร้อย" },
+            { id: "room2", category: "สภาพห้องเรียน", text: "2. การจัดบรรยากาศในห้องเรียนเป็นบรรยากาศทางวิชาการ" },
+            { id: "room3", category: "สภาพห้องเรียน", text: "3. มีป้ายแสดงข้อมูลสถิติของห้องเรียนที่เป็นปัจจุบัน" },
+            { id: "room4", category: "สภาพห้องเรียน", text: "4. มีสัญลักษณ์ชาติ ศาสนา พระมหากษัตริย์" },
+            { id: "room5", category: "สภาพห้องเรียน", text: "5. มีการจัดมุมวิชาการ หรือมุมประสบการณ์ทางการเรียนรู้" },
+            
+            { id: "teacher1", category: "พฤติกรรมของครู", text: "1. มีการเตรียมการสอน และบันทึกการสอน" },
+            { id: "teacher2", category: "พฤติกรรมของครู", text: "2. มีสื่อ อุปกรณ์การสอน และมีร่องรอยการใช้" },
+            { id: "teacher3", category: "พฤติกรรมของครู", text: "3. ควบคุมดูแลการจัดห้องเรียนให้มีบรรยากาศแห่งการเรียนรู้" },
+            { id: "teacher4", category: "พฤติกรรมของครู", text: "4. พูดด้วยน้ำเสียงน่าฟังและเร้าความสนใจของนักเรียน" },
+            { id: "teacher5", category: "พฤติกรรมของครู", text: "5. แต่งกายเหมาะสมกับสภาพความเป็นครู" },
+            
+            { id: "student1", category: "พฤติกรรมของนักเรียน", text: "1. กล้าพูดกล้าคุยกับคนแปลกหน้าและกล้าซักถามครูผู้สอน" },
+            { id: "student2", category: "พฤติกรรมของนักเรียน", text: "2. กระตือรือร้นที่จะเรียนรู้" },
+            { id: "student3", category: "พฤติกรรมของนักเรียน", text: "3. มีความสนุกสนาน ร่าเริง แจ่มใส" },
+            { id: "student4", category: "พฤติกรรมของนักเรียน", text: "4. สนใจปฏิบัติกิจกรรมที่ได้รับมอบหมาย" },
+            { id: "student5", category: "พฤติกรรมของนักเรียน", text: "5. แต่งกายสะอาด เรียบร้อย" },
+            { id: "student6", category: "พฤติกรรมของนักเรียน", text: "6. มีระเบียบวินัยดี และมีมารยาทเรียบร้อย" }
+        ];
+
+        // ฟังก์ชันตรวจสอบวันติดภารกิจ/งดนิเทศ
+        function isBusyDayCheck(teacherName) {
+            if (!teacherName) return false;
+            const name = teacherName.toString();
+            return name.includes("ติดภารกิจ") || 
+                   name.includes("งดนิเทศ") || 
+                   name.includes("ภารกิจ") || 
+                   name.includes("ผอ.") || 
+                   name.includes("ผู้อำนวยการ");
+        }
+
+        // ฟังก์ชันแปลง ISO Date ใน UTC ให้เป็นปี ค.ศ. ท้องถิ่น (ป้องกันปัญหา Timezone Offset ทำให้วันลดลง 1 วัน)
+        function getLocalYYYYMMDD(dateStr) {
+            if (!dateStr) return "";
+            const str = dateStr.toString().trim();
+            if (str.includes("T")) {
+                const dateObj = new Date(str);
+                if (!isNaN(dateObj.getTime())) {
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            }
+            return str.split("T")[0].trim();
+        }
+
+        // ฟังก์ชันจัดรูปแบบวันที่ให้เป็น พ.ศ. (เช่น 19/06/2569)
+        function formatThaiBEDate(dateStr) {
+            if (!dateStr) return "";
+            const cleanDate = getLocalYYYYMMDD(dateStr);
+            const parts = cleanDate.split("-");
+            if (parts.length === 3 && parts[0].length === 4) {
+                const year = parseInt(parts[0], 10);
+                const beYear = year > 2400 ? year : year + 543;
+                return `${parts[2]}/${parts[1]}/${beYear}`;
+            }
+            return dateStr;
+        }
+
+        // ฟังก์ชันจัดรูปแบบเวลาให้เป็นจุด (เช่น 09.15)
+        function formatThaiTime(timeStr) {
+            if (!timeStr) return "";
+            const str = timeStr.toString().trim();
+            if (str.includes("T")) {
+                const timePart = str.split("T")[1];
+                const timeHM = timePart.split(":");
+                if (timeHM.length >= 2) {
+                    return `${timeHM[0]}.${timeHM[1]}`;
+                }
+            }
+            const parts = str.split(":");
+            if (parts.length >= 2) {
+                return `${parts[0]}.${parts[1]}`;
+            }
+            return str;
+        }
+
+        let isMockMode = true;
+        let db = { bookings: [], submissions: [], evaluations: [] };
+        let calendar = null;
+        let latestSubmissionId = null;
+
+        // ========================================================
+        // LOCAL STORAGE DATABASE MOCK FOR DEMONSTRATION & FAILSAFE
+        // ========================================================
+        const LocalDb = {
+            init: function() {
+                if (!localStorage.getItem("supervision_db_v2")) {
+                    const sampleBookings = [
+                        { id: "BK01", teacherName: "ครูจีรศักดิ์ ใจกล้า", department: "วิทยาศาสตร์และเทคโนโลยี", date: "2026-06-03", time: "09:30", period: "2", subject: "วิทยาการคำนวณ", subjectCode: "ว21103", classRoom: "ม.1/1", status: "Confirmed", rowNum: 2 },
+                        { id: "BK02", teacherName: "ครูมัช พรหมแก้ว", department: "คณิตศาสตร์", date: "2026-06-04", time: "10:30", period: "3", subject: "คณิตศาสตร์พื้นฐาน", subjectCode: "ค32101", classRoom: "ม.5/2", status: "Pending", rowNum: 3 },
+                        { id: "BK03", teacherName: "ครูสมหญิง สมบัติ", department: "ภาษาไทย", date: "2026-06-05", time: "13:00", period: "5", subject: "ภาษาไทยหลัก", subjectCode: "ท12101", classRoom: "ป.2/1", status: "Confirmed", rowNum: 4 },
+                        { id: "BK04", teacherName: "ครูวิรุฬห์ ตั้งหลัก", department: "สังคมศึกษา ศาสนา และวัฒนธรรม", date: "2026-06-08", time: "14:00", period: "6", subject: "ประวัติศาสตร์ชาติไทย", subjectCode: "ส22102", classRoom: "ม.2/3", status: "Supervised", rowNum: 5 }
+                    ];
+                    const sampleSubmissions = [
+                        { id: "SB01", teacherName: "ครูจีรศักดิ์ ใจกล้า", planUrl: "https://drive.google.com/file/d/sample_plan", mediaUrl: "https://drive.google.com/file/d/sample_media", image1Url: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500", image2Url: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=500", image3Url: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500", image4Url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500", status: "Passed" }
+                    ];
+                    const sampleEvaluations = [
+                        { 
+                            id: "EV01", 
+                            teacherName: "ครูวิรุฬห์ ตั้งหลัก", 
+                            date: "2026-06-02", 
+                            strengths: "จัดบรรยากาศได้ดีเยี่ยม สื่อตรงประเด็นการเรียนรู้", 
+                            improvement: "ปรับปรุงด้านการควบคุมเวลาตอนทำกิจกรรมกลุ่มเล็กน้อย", 
+                            suggestions: "เน้นป้ายสถิติการอัปเดตงานนักเรียนเป็นปัจจุบัน", 
+                            rating: "ดีมาก",
+                            averageScore: "4.81",
+                            scores: { room1: 5, room2: 5, room3: 4, room4: 5, room5: 5, teacher1: 5, teacher2: 4, teacher3: 5, teacher4: 5, teacher5: 5, student1: 4, student2: 5, student3: 5, student4: 5, student5: 5, student6: 5 }
+                        }
+                    ];
+                    db = { bookings: sampleBookings, submissions: sampleSubmissions, evaluations: sampleEvaluations };
+                    this.save();
+                } else {
+                    db = JSON.parse(localStorage.getItem("supervision_db_v2"));
+                }
+            },
+            save: function() {
+                localStorage.setItem("supervision_db_v2", JSON.stringify(db));
+            }
+        };
+
+        // ========================================================
+        // APPLICATION CORE & FLOW
+        // ========================================================
+        $(document).ready(function() {
+            // โหลดรูปภาพตราโรงเรียนในระบบ
+            insertSchoolLogo();
+            
+            // ตรวจสอบการใช้งาน Firebase Auth
+            initFirebaseAuth();
+            
+            // ตรวจสอบ Configuration API
+            if (CONFIG.API_URL && CONFIG.API_URL.trim() !== "" && CONFIG.API_URL.indexOf("ใส่ลิงก์เว็บแอป") === -1) {
+                isMockMode = false;
+                $("#db-status-badge").html('<i class="bi bi-cloud-check-fill me-1"></i> เชื่อมต่อ Google Apps Script Web App').removeClass("bg-warning text-dark").addClass("bg-success text-white");
+            } else {
+                isMockMode = true;
+                LocalDb.init();
+                $("#db-status-badge").html('<i class="bi bi-database-fill me-1"></i> โหมดฐานข้อมูลจำลอง (Mock)').removeClass("bg-warning text-dark").addClass("bg-info text-dark");
+            }
+
+            // แสดงคำถามแบบประเมินนิเทศ 16 ข้อ
+            renderEvaluationFormCriteria();
+
+            // เริ่มต้นแสดงผลหน้าหลัก (Dashboard)
+            loadDashboard();
+            initializeCalendar();
+
+            // ตั้งค่าฟอร์ม Validation
+            setupFormValidations();
+        });
+
+        // ฟังก์ชันวาดตราโรงเรียนตามตัวเลือก
+        function insertSchoolLogo() {
+            const defaultSvgCrest = `
+                <svg width="45" height="45" viewBox="0 0 100 100" class="me-2 rounded-circle" style="background-color: var(--pastel-blue); padding: 5px;">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#D4AF37" stroke-width="3"/>
+                    <circle cx="50" cy="50" r="41" fill="#2196F3"/>
+                    <path d="M25,65 C35,65 45,60 50,55 C55,60 65,65 75,65 L75,35 C65,35 55,30 50,25 C45,30 35,35 25,35 Z" fill="#FFF" stroke="#D4AF37" stroke-width="1.5"/>
+                    <line x1="50" y1="26" x2="50" y2="55" stroke="#D4AF37" stroke-width="2"/>
+                    <path d="M50,12 C47,16 47,20 50,23 C53,20 53,16 50,12 Z" fill="#EF5350"/>
+                    <path d="M50,14 C49,16 49,18 50,20 C51,18 51,16 50,14 Z" fill="#FBC02D"/>
+                </svg>
+            `;
+
+            // แสดงในหน้าเว็บหลัก
+            if (CONFIG.LOGO_URL && CONFIG.LOGO_URL.trim() !== "") {
+                const imgTag = `<img src="${CONFIG.LOGO_URL}" alt="ตราโรงเรียนวัดบ้านดาบ" style="height: 45px; width: 45px; object-fit: contain; margin-right: 10px;" class="rounded-circle">`;
+                $("#school-logo-container").html(imgTag);
+                $("#print-logo-summary").html(imgTag.replace("height: 45px; width: 45px;", "height: 80px; width: 80px;"));
+                $("#print-logo-cert").html(imgTag.replace("height: 45px; width: 45px;", "height: 90px; width: 90px;"));
+            } else {
+                $("#school-logo-container").html(defaultSvgCrest);
+                $("#print-logo-summary").html(defaultSvgCrest.replace('width="45" height="45"', 'width="80" height="80"'));
+                $("#print-logo-cert").html(defaultSvgCrest.replace('width="45" height="45"', 'width="90" height="90"'));
+            }
+        }
+
+        // แสดงผลรายการประเมินแบบแยกหัวข้อหลัก
+        function renderEvaluationFormCriteria() {
+            let roomHtml = "";
+            let teacherHtml = "";
+            let studentHtml = "";
+
+            EVAL_ITEMS.forEach(item => {
+                const rowHtml = `
+                    <div class="row align-items-center mb-2 pb-2 border-bottom border-light">
+                        <div class="col-md-7">
+                            <span class="fs-6">${item.text}</span>
+                        </div>
+                        <div class="col-md-5 text-md-end mt-1 mt-md-0">
+                            <div class="btn-group score-btn-group" role="group" aria-label="Score criteria">
+                                <input type="radio" class="btn-check score-radio" name="score_${item.id}" id="sc_${item.id}_1" value="1" required>
+                                <label class="btn btn-outline-secondary btn-sm px-3" for="sc_${item.id}_1">1</label>
+                                
+                                <input type="radio" class="btn-check score-radio" name="score_${item.id}" id="sc_${item.id}_2" value="2">
+                                <label class="btn btn-outline-secondary btn-sm px-3" for="sc_${item.id}_2">2</label>
+                                
+                                <input type="radio" class="btn-check score-radio" name="score_${item.id}" id="sc_${item.id}_3" value="3">
+                                <label class="btn btn-outline-secondary btn-sm px-3" for="sc_${item.id}_3">3</label>
+                                
+                                <input type="radio" class="btn-check score-radio" name="score_${item.id}" id="sc_${item.id}_4" value="4">
+                                <label class="btn btn-outline-secondary btn-sm px-3" for="sc_${item.id}_4">4</label>
+                                
+                                <input type="radio" class="btn-check score-radio" name="score_${item.id}" id="sc_${item.id}_5" value="5">
+                                <label class="btn btn-outline-secondary btn-sm px-3" for="sc_${item.id}_5">5</label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (item.category === "สภาพห้องเรียน") roomHtml += rowHtml;
+                else if (item.category === "พฤติกรรมของครู") teacherHtml += rowHtml;
+                else if (item.category === "พฤติกรรมของนักเรียน") studentHtml += rowHtml;
+            });
+
+            $("#criteria-classroom-container").html(roomHtml);
+            $("#criteria-teacher-container").html(teacherHtml);
+            $("#criteria-student-container").html(studentHtml);
+
+            // ดักจับการเปลี่ยนแปลงปุ่มวิทยุเพื่อคำนวณเกณฑ์อัตโนมัติ
+            $(".score-radio").on("change", function() {
+                calculateRealtimeEvaluationAverage();
+            });
+        }
+
+        // คำนวณคะแนนเฉลี่ยแบบเรียลไทม์
+        function calculateRealtimeEvaluationAverage() {
+            let sum = 0;
+            let answered = 0;
+            
+            EVAL_ITEMS.forEach(item => {
+                const val = $(`input[name="score_${item.id}"]:checked`).val();
+                if (val) {
+                    sum += parseInt(val);
+                    answered++;
+                }
+            });
+
+            if (answered === EVAL_ITEMS.length) {
+                const avg = (sum / EVAL_ITEMS.length).toFixed(2);
+                $("#eval-avg-score-badge").text(avg);
+                
+                // เกณฑ์การแปลความหมายของคะแนน
+                let rating = "";
+                let badgeClass = "";
+                
+                if (avg >= 4.51 && avg <= 5.00) { rating = "ดีมาก"; badgeClass = "bg-verygood"; }
+                else if (avg >= 3.51 && avg <= 4.50) { rating = "ดี"; badgeClass = "bg-good"; }
+                else if (avg >= 2.51 && avg <= 3.50) { rating = "ปานกลาง"; badgeClass = "bg-fair"; }
+                else if (avg >= 1.51 && avg <= 2.50) { rating = "พอใช้"; badgeClass = "bg-fair"; }
+                else { rating = "ควรปรับปรุง"; badgeClass = "bg-poor"; }
+
+                $("#eval-rating-badge").text("ระดับ: " + rating).removeClass().addClass("evaluation-badge " + badgeClass);
+            } else {
+                $("#eval-avg-score-badge").text("0.00");
+                $("#eval-rating-badge").text(`เลือกแล้ว ${answered}/16 ข้อ`).removeClass().addClass("evaluation-badge bg-poor text-dark");
+            }
+        }
+
+        // สลับแท็บเมนู
+        function switchTab(tabName) {
+            $(".nav-link-custom").removeClass("active");
+            $("#tab-" + tabName).addClass("active");
+            $(".tab-content-item").addClass("d-none");
+            $("#sect-" + tabName).removeClass("d-none");
+
+            if (tabName === "dashboard") {
+                loadDashboard();
+            } else if (tabName === "supervision") {
+                populateSupervisionTeachers();
+            } else if (tabName === "admin") {
+                checkAdminSession();
+            }
+        }
+
+        // ========================================================
+        // AUTHENTICATION & SECURITY (FIREBASE AUTH & SIMPLE PASSWORD)
+        // ========================================================
+        function initFirebaseAuth() {
+            if (CONFIG.FIREBASE.apiKey && CONFIG.FIREBASE.apiKey.trim() !== "") {
+                try {
+                    firebase.initializeApp(CONFIG.FIREBASE);
+                    firebase.auth().signInAnonymously()
+                        .then(() => console.log("Firebase Auth Anonymous Connected."))
+                        .catch((error) => console.error("Firebase Auth Error", error));
+                } catch(e) {
+                    console.warn("Firebase Init failed.", e);
+                }
+            }
+        }
+
+        function checkAdminSession() {
+            const isAdmin = sessionStorage.getItem("isAdminLoggedIn");
+            if (isAdmin === "true") {
+                $("#admin-login-box").addClass("d-none");
+                $("#admin-content-box").removeClass("d-none");
+                loadAdminData();
+            } else {
+                $("#admin-login-box").removeClass("d-none");
+                $("#admin-content-box").addClass("d-none");
+            }
+        }
+
+        function checkAdminPassword() {
+            const password = $("#admin-password-input").val();
+            if (password === "557889") {
+                sessionStorage.setItem("isAdminLoggedIn", "true");
+                $("#admin-password-input").val("");
+                Swal.fire({ icon: 'success', title: 'ยืนยันตัวตนสำเร็จ', timer: 1000, showConfirmButton: false })
+                    .then(() => checkAdminSession());
+            } else {
+                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง', text: 'กรุณาลองป้อนรหัสผ่านใหม่อีกครั้ง' });
+            }
+        }
+
+        // ออกจากระบบแอดมิน
+        function logoutAdmin() {
+            sessionStorage.removeItem("isAdminLoggedIn");
+            Swal.fire({ icon: 'info', title: 'ออกจากระบบสำเร็จ', timer: 1000, showConfirmButton: false })
+                .then(() => checkAdminSession());
+        }
+
+        // ========================================================
+        // FETCHING DATA (API CONNECTION OR LOCAL STORAGE MOCK)
+        // ========================================================
+        function callAPI(action, payload = {}) {
+            // ดักจับการรันแบบ Native ภายในระบบ Google Apps Script Web App (ถ้ามีออบเจกต์ google)
+            if (typeof google !== "undefined" && google.script && google.script.run) {
+                return new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler(res => {
+                            if (res && res.status === "error") {
+                                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดจากระบบ', text: res.message });
+                                reject(res);
+                            } else {
+                                resolve(res);
+                            }
+                        })
+                        .withFailureHandler(err => {
+                            Swal.fire({ icon: 'error', title: 'การเชื่อมต่อ Apps Script ล้มเหลว', text: err.toString() });
+                            reject(err);
+                        })
+                        .executeActionFromServer(action, payload);
+                });
+            }
+
+            if (isMockMode) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        let response = { status: "success" };
+                        
+                        if (action === "getDashboardData") {
+                            response = {
+                                status: "success",
+                                stats: {
+                                    totalBookings: db.bookings.length,
+                                    totalEvaluated: db.evaluations.length,
+                                    totalSubmissions: db.submissions.length
+                                },
+                                latestBookings: db.bookings.slice(-5).reverse(),
+                                allBookings: [...db.bookings],
+                                latestSubmissions: db.submissions.slice(-5).reverse(),
+                                latestEvaluations: db.evaluations.slice(-5).reverse()
+                            };
+                        } 
+                        else if (action === "getAdminData") {
+                            response = {
+                                status: "success",
+                                bookings: [...db.bookings].reverse(),
+                                submissions: [...db.submissions].reverse(),
+                                evaluations: [...db.evaluations].reverse()
+                            };
+                        }
+                        else if (action === "addBooking") {
+                            const newBooking = {
+                                id: "BK" + new Date().getTime(),
+                                teacherName: payload.teacherName,
+                                department: payload.department,
+                                date: payload.date,
+                                time: payload.time,
+                                period: payload.period,
+                                subject: payload.subject,
+                                subjectCode: payload.subjectCode,
+                                classRoom: payload.classRoom,
+                                status: "Pending",
+                                rowNum: db.bookings.length + 2
+                            };
+                            db.bookings.push(newBooking);
+                            LocalDb.save();
+                            response.id = newBooking.id;
+                        }
+                        else if (action === "updateBooking") {
+                            const index = db.bookings.findIndex(b => b.id === payload.id);
+                            if (index !== -1) {
+                                db.bookings[index] = { ...db.bookings[index], ...payload };
+                                LocalDb.save();
+                            }
+                        }
+                        else if (action === "deleteBooking") {
+                            db.bookings = db.bookings.filter(b => b.id !== payload);
+                            LocalDb.save();
+                        }
+                        else if (action === "updateBookingStatus") {
+                            const index = db.bookings.findIndex(b => b.id === payload.id);
+                            if (index !== -1) {
+                                db.bookings[index].status = payload.status;
+                                LocalDb.save();
+                            }
+                        }
+                        else if (action === "updateSubmissionStatus") {
+                            const index = db.submissions.findIndex(s => s.id === payload.id);
+                            if (index !== -1) {
+                                db.submissions[index].status = payload.status;
+                                LocalDb.save();
+                            }
+                        }
+                        else if (action === "submitWork") {
+                            const existingIdx = db.submissions.findIndex(s => s.teacherName === payload.teacherName);
+                            let subId;
+                            if (existingIdx !== -1) {
+                                subId = db.submissions[existingIdx].id;
+                                if (payload.planFile) {
+                                    db.submissions[existingIdx].planUrl = "https://drive.google.com/mock_file_plan_" + payload.teacherName;
+                                }
+                                if (payload.mediaFile) {
+                                    db.submissions[existingIdx].mediaUrl = "https://drive.google.com/mock_file_media_" + payload.teacherName;
+                                }
+                                if (payload.image1) {
+                                    db.submissions[existingIdx].image1Url = "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500";
+                                    db.submissions[existingIdx].image2Url = "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=500";
+                                    db.submissions[existingIdx].image3Url = "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500";
+                                    db.submissions[existingIdx].image4Url = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500";
+                                }
+                                db.submissions[existingIdx].status = "Pending";
+                            } else {
+                                subId = "SB" + new Date().getTime();
+                                const newSub = {
+                                    id: subId,
+                                    teacherName: payload.teacherName,
+                                    planUrl: payload.planFile ? "https://drive.google.com/mock_file_plan_" + payload.teacherName : "",
+                                    mediaUrl: payload.mediaFile ? "https://drive.google.com/mock_file_media_" + payload.teacherName : "",
+                                    image1Url: payload.image1 ? "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500" : "",
+                                    image2Url: payload.image2 ? "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=500" : "",
+                                    image3Url: payload.image3 ? "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500" : "",
+                                    image4Url: payload.image4 ? "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500" : "",
+                                    status: "Pending"
+                                };
+                                db.submissions.push(newSub);
+                            }
+                            LocalDb.save();
+                            response.id = subId;
+                        }
+                        else if (action === "addEvaluation") {
+                            const newEval = {
+                                id: "EV" + new Date().getTime(),
+                                teacherName: payload.teacherName,
+                                date: payload.date,
+                                strengths: payload.strengths,
+                                improvement: payload.improvement,
+                                suggestions: payload.suggestions,
+                                rating: payload.rating,
+                                averageScore: payload.averageScore,
+                                scores: payload.scores
+                            };
+                            db.evaluations.push(newEval);
+                            
+                            const bkIdx = db.bookings.findIndex(b => b.teacherName === payload.teacherName && b.status === "Confirmed");
+                            if (bkIdx !== -1) db.bookings[bkIdx].status = "Supervised";
+                            
+                            LocalDb.save();
+                            response.id = newEval.id;
+                        }
+                        
+                        resolve(response);
+                    }, 500);
+                });
+            } else {
+                return fetch(CONFIG.API_URL, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: action, data: payload })
+                }).then(res => res.json());
+            }
+        }
+
+        // ========================================================
+        // TAB 1: DASHBOARD LOGIC
+        // ========================================================
+        function loadDashboard() {
+            callAPI("getDashboardData").then(res => {
+                if (res.status === "success") {
+                    $("#stat-total-bookings").text(res.stats.totalBookings);
+                    $("#stat-total-supervised").text(res.stats.totalEvaluated);
+                    $("#stat-total-submissions").text(res.stats.totalSubmissions);
+
+                    let evalHtml = "";
+                    if (res.latestEvaluations && res.latestEvaluations.length > 0) {
+                        res.latestEvaluations.forEach(ev => {
+                            let badgeClass = "bg-good";
+                            const rating = ev.Rating || ev.rating;
+                            if (rating === "ดีมาก") badgeClass = "bg-verygood";
+                            else if (rating === "ดี") badgeClass = "bg-good";
+                            else if (rating === "ปานกลาง" || rating === "พอใช้") badgeClass = "bg-fair";
+                            else badgeClass = "bg-poor";
+
+                            evalHtml += `
+                                <div class="eval-card shadow-sm border-start border-primary border-4 p-3 bg-light rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 text-dark">${ev.TeacherName || ev.teacherName}</h6>
+                                        <span class="evaluation-badge ${badgeClass}">${rating} (${ev.AverageScore || ev.averageScore || '0.00'})</span>
+                                    </div>
+                                    <p class="mb-1 text-muted" style="font-size:0.85rem;"><i class="bi bi-calendar-event me-1"></i> นิเทศเมื่อ: ${ev.Date || ev.date}</p>
+                                    <p class="mb-0 text-truncate" style="font-size:0.85rem;" title="${ev.Strengths || ev.strengths}"><strong>จุดเด่น:</strong> ${ev.Strengths || ev.strengths}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        evalHtml = '<div class="text-muted text-center py-4">ไม่พบข้อมูลการประเมิน</div>';
+                    }
+                    $("#evaluations-scroller").html(evalHtml);
+
+                    let bookingRows = "";
+                    if (res.latestBookings && res.latestBookings.length > 0) {
+                        res.latestBookings.forEach(bk => {
+                            const teacherName = bk.TeacherName || bk.teacherName || "";
+                            const isBusyDay = isBusyDayCheck(teacherName);
+                            if (isBusyDay) return; // skip showing in the list!
+                            
+                            let statusBadge = "";
+                            let actionBtn = "";
+                            const status = bk.Status || bk.status;
+                            const bkId = bk.id || bk.ID;
+                            
+                            if (status === "Confirmed") {
+                                statusBadge = '<span class="badge bg-success">อนุมัติแล้ว</span>';
+                                actionBtn = `<button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 0.8rem; border-radius: 6px;" onclick="cancelBookingTeacher('${bkId}', '${teacherName}')"><i class="bi bi-x-circle"></i> ยกเลิก</button>`;
+                            } else if (status === "Supervised") {
+                                statusBadge = '<span class="badge bg-primary">นิเทศแล้ว</span>';
+                                actionBtn = `<span class="text-muted small">-</span>`;
+                            } else {
+                                statusBadge = '<span class="badge bg-warning text-dark">รออนุมัติ</span>';
+                                actionBtn = `<button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 0.8rem; border-radius: 6px;" onclick="cancelBookingTeacher('${bkId}', '${teacherName}')"><i class="bi bi-x-circle"></i> ยกเลิก</button>`;
+                            }
+
+                            bookingRows += `
+                                <tr>
+                                    <td class="fw-bold">${teacherName}</td>
+                                    <td>${bk.Subject || bk.subject}</td>
+                                    <td>${formatThaiBEDate(bk.Date || bk.date)} :${formatThaiTime(bk.Time || bk.time)}</td>
+                                    <td>${statusBadge}</td>
+                                    <td class="text-center">${actionBtn}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        bookingRows = '<tr><td colspan="5" class="text-center text-muted">ไม่พบข้อมูลการจอง</td></tr>';
+                    }
+                    $("#tbl-latest-bookings tbody").html(bookingRows);
+
+                    let subRows = "";
+                    if (res.latestSubmissions && res.latestSubmissions.length > 0) {
+                        res.latestSubmissions.forEach(sub => {
+                            let statusBadge = "";
+                            const status = sub.Status || sub.status;
+                            if (status === "Passed") statusBadge = '<span class="badge bg-success">ผ่านการตรวจ</span>';
+                            else if (status === "Improve") statusBadge = '<span class="badge bg-danger">ควรปรับปรุง</span>';
+                            else statusBadge = '<span class="badge bg-warning text-dark">รอตรวจ</span>';
+
+                            let planLink = "";
+                            const planUrl = sub.PlanUrl || sub.planUrl;
+                            if (planUrl && planUrl.trim() !== "") {
+                                planLink = `<a href="${planUrl}" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2"><i class="bi bi-file-earmark-pdf"></i> เปิดดูไฟล์</a>`;
+                            } else {
+                                planLink = `<span class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle"></i> ไม่พบไฟล์</span>`;
+                            }
+
+                            subRows += `
+                                <tr>
+                                    <td class="fw-bold">${sub.TeacherName || sub.teacherName}</td>
+                                    <td>${planLink}</td>
+                                    <td>${statusBadge}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        subRows = '<tr><td colspan="3" class="text-center text-muted">ไม่พบข้อมูลการส่งงาน</td></tr>';
+                    }
+                    $("#tbl-latest-submissions tbody").html(subRows);
+
+                    // โหลดข้อมูลการจองทั้งหมดมาแสดงในปฏิทิน (โดยไม่ต้องแก้ไขโค้ดฝั่ง Apps Script ในชีต)
+                    callAPI("getAdminData").then(adminRes => {
+                        if (adminRes.status === "success" && adminRes.bookings) {
+                            updateCalendarEvents(adminRes.bookings);
+                        } else {
+                            updateCalendarEvents(res.allBookings || res.latestBookings || []);
+                        }
+                    }).catch(() => {
+                        updateCalendarEvents(res.allBookings || res.latestBookings || []);
+                    });
+                }
+            });
+        }
+
+        function initializeCalendar() {
+            var calendarEl = document.getElementById('calendar');
+            if (typeof FullCalendar !== 'undefined') {
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'th',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listWeek'
+                    },
+                    events: [],
+                    eventClick: function(info) {
+                        const eventObj = info.event;
+                        const props = eventObj.extendedProps;
+                        const isAdmin = sessionStorage.getItem("isAdminLoggedIn") === "true";
+                        const isSupervised = props.status === "Supervised" || props.isBusyDay;
+                        
+                        let popupHtml = "";
+                        if (props.isBusyDay) {
+                            popupHtml = `
+                                <div class="text-start fs-6 p-2">
+                                    <p class="mb-2 text-danger"><strong><i class="bi bi-info-circle-fill"></i> วันงดนิเทศ/ติดภารกิจ</strong></p>
+                                    <p class="mb-2"><strong>รายละเอียด:</strong> ${eventObj.title}</p>
+                                    <p class="mb-2"><strong>วันที่:</strong> ${eventObj.start.toLocaleDateString('th-TH')}</p>
+                                    <p class="mb-2"><strong>เวลา:</strong> ${props.time} น. (คาบที่ ${props.period})</p>
+                                    <p class="mb-0"><strong>สถานะ:</strong> <span class="badge bg-danger">${props.statusText}</span></p>
+                                </div>
+                            `;
+                        } else {
+                            popupHtml = `
+                                <div class="text-start fs-6 p-2">
+                                    <p class="mb-1"><strong>กลุ่มสาระฯ:</strong> ${props.department}</p>
+                                    <p class="mb-1"><strong>วิชา:</strong> ${props.subject} (${props.subjectCode})</p>
+                                    <p class="mb-1"><strong>ชั้นเรียน:</strong> ${props.classRoom}</p>
+                                    <p class="mb-1"><strong>วันเวลาที่นิเทศ:</strong> ${eventObj.start.toLocaleDateString('th-TH')} เวลา ${props.time} น. (คาบที่ ${props.period})</p>
+                                    <p class="mb-0"><strong>สถานะการจอง:</strong> ${props.statusText}</p>
+                                </div>
+                            `;
+                        }
+                        
+                        Swal.fire({
+                            title: props.isBusyDay ? `<i class="bi bi-calendar-x text-danger"></i> แจ้งวันติดภารกิจ` : `<i class="bi bi-calendar-event text-primary"></i> ${eventObj.title}`,
+                            html: popupHtml,
+                            showDenyButton: isAdmin ? true : !isSupervised,
+                            denyButtonText: isAdmin ? '<i class="bi bi-trash me-1"></i> ลบการจองนี้' : '<i class="bi bi-x-circle me-1"></i> ยกเลิกการจองนี้',
+                            denyButtonColor: '#EF5350',
+                            confirmButtonText: 'ปิด',
+                            confirmButtonColor: '#2196F3'
+                        }).then((result) => {
+                            if (result.isDenied) {
+                                if (isAdmin) {
+                                    deleteBookingRecord(props.id);
+                                } else {
+                                    cancelBookingTeacher(props.id, eventObj.title);
+                                }
+                            }
+                        });
+                    }
+                });
+                calendar.render();
+            } else {
+                calendarEl.innerHTML = '<div class="alert alert-warning py-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>เครือข่ายอินเทอร์เน็ตของโรงเรียนมีการบล็อกไฟล์ปฏิทิน ไม่สามารถเปิดปฏิทินแบบกราฟิกได้</div>';
+            }
+        }
+
+        function updateCalendarEvents(bookings) {
+            if (!calendar) return;
+            calendar.removeAllEvents();
+            
+            bookings.forEach(bk => {
+                const teacherName = bk.TeacherName || bk.teacherName || "";
+                const isBusyDay = isBusyDayCheck(teacherName);
+                
+                let statusText = "รออนุมัติ";
+                let color = "#FBC02D";
+                const status = bk.Status || bk.status;
+                
+                if (isBusyDay) {
+                    color = "#EF5350"; // Red color for busy day
+                    statusText = "ติดภารกิจ (งดนิเทศ)";
+                } else if (status === "Confirmed") {
+                    statusText = "อนุมัติการสอนแล้ว";
+                    color = "#4CAF50";
+                } else if (status === "Supervised") {
+                    statusText = "นิเทศการสอนเสร็จสิ้น";
+                    color = "#2196F3";
+                }
+
+                const cleanDate = getLocalYYYYMMDD(bk.Date || bk.date || "");
+                let calendarStart = cleanDate;
+                
+                const parts = cleanDate.split("-");
+                if (parts.length === 3 && parts[0].length === 4) {
+                    const year = parseInt(parts[0], 10);
+                    const adYear = year > 2400 ? year - 543 : year;
+                    calendarStart = `${adYear}-${parts[1]}-${parts[2]}`;
+                }
+
+                calendar.addEvent({
+                    title: teacherName,
+                    start: calendarStart,
+                    color: color,
+                    extendedProps: {
+                        id: bk.id || bk.ID,
+                        department: bk.Department || bk.department,
+                        subject: bk.Subject || bk.subject,
+                        subjectCode: bk.SubjectCode || bk.subjectCode,
+                        classRoom: bk.ClassRoom || bk.classRoom,
+                        period: bk.Period || bk.period,
+                        time: bk.Time || bk.time,
+                        status: status,
+                        isBusyDay: isBusyDay,
+                        statusText: statusText
+                    }
+                });
+            });
+        }
+
+        // ========================================================
+        // TAB 2 & 3 & 4: FORMS LOGIC AND VALIDATIONS
+        // ========================================================
+        function setupFormValidations() {
+            // จองวันนิเทศ
+            $("#form-booking").on("submit", function(e) {
+                e.preventDefault();
+                const form = this;
+                if (!form.checkValidity()) {
+                    e.stopPropagation();
+                    $(form).addClass("was-validated");
+                    return;
+                }
+
+                const formData = {
+                    teacherName: form.teacherName.value,
+                    department: form.department.value,
+                    date: form.date.value,
+                    time: form.time.value,
+                    period: form.period.value,
+                    subject: form.subject.value,
+                    subjectCode: form.subjectCode.value,
+                    classRoom: form.classRoom.value
+                };
+
+                Swal.fire({ title: 'กำลังบันทึกข้อมูลการจอง...', didOpen: () => Swal.showLoading() });
+
+                callAPI("addBooking", formData).then(res => {
+                    Swal.close();
+                    if (res.status === "success") {
+                        Swal.fire({ icon: 'success', title: 'บันทึกการจองสำเร็จ!', text: 'กรุณารอผู้ดูแลระบบตรวจสอบอนุมัติวันนิเทศ', confirmButtonColor: '#2196F3' }).then(() => {
+                            form.reset();
+                            $(form).removeClass("was-validated");
+                            switchTab("dashboard");
+                        });
+                    }
+                });
+            });
+
+            // อัปโหลดงาน
+            $("#form-upload").on("submit", function(e) {
+                e.preventDefault();
+                const form = this;
+                
+                const teacherName = form.teacherName.value.trim();
+                const planFileSelected = form.planFile.files.length > 0;
+                const mediaFileSelected = form.mediaFile.files.length > 0;
+                
+                const hasImg1 = form.image1.files.length > 0;
+                const hasImg2 = form.image2.files.length > 0;
+                const hasImg3 = form.image3.files.length > 0;
+                const hasImg4 = form.image4.files.length > 0;
+                const hasAnyImage = hasImg1 || hasImg2 || hasImg3 || hasImg4;
+                const hasAllImages = hasImg1 && hasImg2 && hasImg3 && hasImg4;
+                
+                if (!teacherName) {
+                    Swal.fire("กรุณากรอกข้อมูล", "กรุณาระบุชื่อ-นามสกุล ครูผู้ส่งงาน", "warning");
+                    return;
+                }
+                
+                if (!planFileSelected && !hasAnyImage && !mediaFileSelected) {
+                    Swal.fire("กรุณาเลือกไฟล์ที่จะส่ง", "กรุณาเลือกอัปโหลดไฟล์แผนการสอน หรือ อัปโหลดรูปภาพกิจกรรม 4 รูป เพื่อดำเนินการต่อ", "warning");
+                    return;
+                }
+                
+                if (hasAnyImage && !hasAllImages) {
+                    Swal.fire("อัปโหลดรูปภาพไม่ครบ", "หากต้องการส่งรูปภาพกิจกรรมการเรียนการสอน กรุณาเลือกไฟล์รูปภาพให้ครบทั้ง 4 รูปภาพ", "warning");
+                    return;
+                }
+
+                Swal.fire({ title: 'กำลังอัปโหลดไฟล์ไปยัง Google Drive...', html: 'กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                const getFileBase64 = (file) => {
+                    if (!file) return Promise.resolve(null);
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => resolve({ base64: reader.result, filename: file.name });
+                        reader.onerror = error => reject(error);
+                    });
+                };
+
+                Promise.all([
+                    getFileBase64(form.planFile.files[0]),
+                    getFileBase64(form.mediaFile.files[0]),
+                    getFileBase64(form.image1.files[0]),
+                    getFileBase64(form.image2.files[0]),
+                    getFileBase64(form.image3.files[0]),
+                    getFileBase64(form.image4.files[0])
+                ]).then(files => {
+                    const uploadData = {
+                        teacherName: teacherName,
+                        planFile: files[0],
+                        mediaFile: files[1],
+                        image1: files[2],
+                        image2: files[3],
+                        image3: files[4],
+                        image4: files[5]
+                    };
+
+                    callAPI("submitWork", uploadData).then(res => {
+                        Swal.close();
+                        if (res.status === "success") {
+                            latestSubmissionId = res.id;
+                            $("#qr-preview-section").removeClass("d-none");
+                            $("#qrcode").empty();
+                            new QRCode(document.getElementById("qrcode"), { text: res.id, width: 128, height: 128 });
+
+                            Swal.fire({ icon: 'success', title: 'ส่งผลงานสำเร็จ!', confirmButtonColor: '#4CAF50' });
+                        }
+                    });
+                });
+            });
+
+            // พิมพ์ใบรับงานส่ง
+            $("#btn-print-receipt").on("click", function() {
+                if (!latestSubmissionId) return;
+                const form = document.getElementById("form-upload");
+                
+                $("#receipt-id").text(latestSubmissionId);
+                $("#receipt-teacher-name").text(form.teacherName.value);
+                $("#receipt-timestamp").text(new Date().toLocaleString('th-TH'));
+                $("#receipt-media").text(form.mediaFile.files[0] ? form.mediaFile.files[0].name : "ไม่ได้ส่งสื่อ");
+
+                $("#receipt-qrcode").empty();
+                new QRCode(document.getElementById("receipt-qrcode"), { text: latestSubmissionId, width: 100, height: 100 });
+
+                window.print();
+            });
+
+            // ส่งผลประเมิน (ผู้นิเทศ)
+            $("#form-supervision").on("submit", function(e) {
+                e.preventDefault();
+                const form = this;
+                
+                // ตรวจสอบว่าเช็คครบ 16 ข้อหรือยัง
+                let unanswered = [];
+                EVAL_ITEMS.forEach(item => {
+                    if (!$(`input[name="score_${item.id}"]:checked`).val()) {
+                        unanswered.push(item.text);
+                    }
+                });
+
+                if (unanswered.length > 0) {
+                    Swal.fire("กรุณาทำแบบประเมินให้ครบ", "มีหัวข้อการประเมินที่ยังไม่ได้ให้คะแนน " + unanswered.length + " ข้อ", "warning");
+                    return;
+                }
+
+                if (!form.checkValidity()) {
+                    e.stopPropagation();
+                    $(form).addClass("was-validated");
+                    return;
+                }
+
+                // รวบรวมคะแนนรายข้อ
+                const scoreValues = {};
+                EVAL_ITEMS.forEach(item => {
+                    scoreValues[item.id] = parseInt($(`input[name="score_${item.id}"]:checked`).val());
+                });
+
+                const avgScore = $("#eval-avg-score-badge").text();
+                
+                // แปลคะแนนประเมินเพื่อส่งฐานข้อมูล
+                let ratingText = "พอใช้";
+                const avg = parseFloat(avgScore);
+                if (avg >= 4.51 && avg <= 5.00) ratingText = "ดีมาก";
+                else if (avg >= 3.51 && avg <= 4.50) ratingText = "ดี";
+                else if (avg >= 2.51 && avg <= 3.50) ratingText = "ปานกลาง";
+                else if (avg >= 1.51 && avg <= 2.50) ratingText = "พอใช้";
+                else ratingText = "ปรับปรุง";
+
+                const evalData = {
+                    teacherName: form.teacherName.value,
+                    date: form.date.value,
+                    strengths: form.strengths.value,
+                    improvement: form.improvement.value,
+                    suggestions: form.suggestions.value,
+                    rating: ratingText,
+                    averageScore: avgScore,
+                    scores: scoreValues
+                };
+
+                Swal.fire({ title: 'กำลังส่งข้อมูลผลการประเมิน...', didOpen: () => Swal.showLoading() });
+
+                callAPI("addEvaluation", evalData).then(res => {
+                    Swal.close();
+                    if (res.status === "success") {
+                        Swal.fire({ icon: 'success', title: 'บันทึกการประเมินนิเทศเรียบร้อยแล้ว!', confirmButtonColor: '#2196F3' }).then(() => {
+                            form.reset();
+                            $(".score-radio").prop("checked", false);
+                            calculateRealtimeEvaluationAverage();
+                            $(form).removeClass("was-validated");
+                            switchTab("dashboard");
+                        });
+                    }
+                });
+            });
+
+            // แอดมินเพิ่มจอง
+            $("#form-admin-add-booking").on("submit", function(e) {
+                e.preventDefault();
+                const form = this;
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modal-add-booking"));
+
+                const data = {
+                    teacherName: form.teacherName.value,
+                    department: form.department.value,
+                    date: form.date.value,
+                    time: form.time.value,
+                    period: form.period.value,
+                    subject: form.subject.value,
+                    subjectCode: form.subjectCode.value,
+                    classRoom: form.classRoom.value
+                };
+
+                Swal.fire({ title: 'กำลังเพิ่มรายการจอง...', didOpen: () => Swal.showLoading() });
+                callAPI("addBooking", data).then(() => {
+                    Swal.close();
+                    modal.hide();
+                    form.reset();
+                    Swal.fire('เพิ่มสำเร็จ', 'เพิ่มรายการจองเรียบร้อย', 'success');
+                    loadAdminData();
+                    loadDashboard();
+                });
+            });
+
+            // แอดมินแก้ไขจอง
+            $("#form-admin-edit-booking").on("submit", function(e) {
+                e.preventDefault();
+                const form = this;
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modal-edit-booking"));
+
+                const data = {
+                    id: form.id.value,
+                    rowNum: form.rowNum.value,
+                    teacherName: form.teacherName.value,
+                    department: form.department.value,
+                    date: form.date.value,
+                    time: form.time.value,
+                    period: form.period.value,
+                    subject: form.subject.value,
+                    subjectCode: form.subjectCode.value,
+                    classRoom: form.classRoom.value
+                };
+
+                Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
+                callAPI("updateBooking", data).then(() => {
+                    Swal.close();
+                    modal.hide();
+                    Swal.fire('เรียบร้อย', 'แก้ไขข้อมูลการจองเรียบร้อย', 'success');
+                    loadAdminData();
+                    loadDashboard();
+                });
+            });
+        }
+
+        // โหลดข้อมูลรายชื่อครูในประเมินผล
+        function populateSupervisionTeachers() {
+            callAPI("getAdminData").then(res => {
+                if (res.status === "success") {
+                    let selectHtml = '<option value="" disabled selected>-- เลือกรายชื่อครูจากรายการจอง --</option>';
+                    const activeBookings = res.bookings.filter(b => {
+                        const statusOk = b.Status === "Confirmed" || b.status === "Confirmed";
+                        const name = b.TeacherName || b.teacherName || "";
+                        const isBusy = isBusyDayCheck(name);
+                        return statusOk && !isBusy;
+                    });
+                    
+                    if (activeBookings.length > 0) {
+                        activeBookings.forEach(b => {
+                            selectHtml += `<option value="${b.TeacherName || b.teacherName}">${b.TeacherName || b.teacherName} (วิชา: ${b.Subject || b.subject})</option>`;
+                        });
+                    } else {
+                        selectHtml += '<option value="" disabled>ไม่มีครูที่ผ่านการอนุมัติการจองและพร้อมรับการนิเทศในขณะนี้</option>';
+                    }
+                    $("#eval-teacher-select").html(selectHtml);
+                }
+            });
+        }
+
+        // ========================================================
+        // TAB 5: ADMIN MANAGEMENT
+        // ========================================================
+        let adminBookingsTable = null;
+        let adminSubmissionsTable = null;
+
+        function loadAdminData() {
+            callAPI("getAdminData").then(res => {
+                if (res.status === "success") {
+                    if (adminBookingsTable) adminBookingsTable.destroy();
+                    if (adminSubmissionsTable) adminSubmissionsTable.destroy();
+
+                    // จัดการการจอง
+                    let bookingRows = "";
+                    res.bookings.forEach(bk => {
+                        const teacherName = bk.TeacherName || bk.teacherName || "";
+                        const isBusyDay = isBusyDayCheck(teacherName);
+                        if (isBusyDay) return; // skip busy days in admin booking list table!
+                        
+                        let statusBadge = "";
+                        let actionButtons = "";
+                        const status = bk.Status || bk.status;
+                        
+                        if (status === "Confirmed") {
+                            statusBadge = '<span class="badge bg-success">อนุมัติแล้ว</span>';
+                            actionButtons += `<button class="btn btn-warning btn-sm me-1" onclick="changeBookingStatus('${bk.id}', 'Pending')"><i class="bi bi-x-circle"></i> ระงับ</button>`;
+                        } else if (status === "Supervised") {
+                            statusBadge = '<span class="badge bg-primary">นิเทศแล้ว</span>';
+                        } else {
+                            statusBadge = '<span class="badge bg-secondary">รออนุมัติ</span>';
+                            actionButtons += `<button class="btn btn-success btn-sm me-1 text-white" onclick="changeBookingStatus('${bk.id}', 'Confirmed')"><i class="bi bi-check2-circle"></i> อนุมัติ</button>`;
+                        }
+
+                        actionButtons += `<button class="btn btn-outline-primary btn-sm me-1" onclick="openEditBookingModal('${encodeURIComponent(JSON.stringify(bk))}')"><i class="bi bi-pencil-square"></i> แก้ไข</button>`;
+                        actionButtons += `<button class="btn btn-outline-danger btn-sm" onclick="deleteBookingRecord('${bk.id}')"><i class="bi bi-trash"></i> ลบ</button>`;
+
+                        bookingRows += `
+                            <tr>
+                                <td>${bk.Timestamp ? bk.Timestamp.substring(0, 10) : '--'}</td>
+                                <td class="fw-bold">${bk.TeacherName || bk.teacherName}</td>
+                                <td>${bk.Department || bk.department}</td>
+                                <td>${bk.Subject || bk.subject} (${bk.SubjectCode || bk.subjectCode})</td>
+                                <td>${formatThaiBEDate(bk.Date || bk.date)} เวลา ${formatThaiTime(bk.Time || bk.time)} น.</td>
+                                <td>ห้อง ${bk.ClassRoom || bk.classRoom} / คาบ ${bk.Period || bk.period}</td>
+                                <td>${statusBadge}</td>
+                                <td><div class="d-flex">${actionButtons}</div></td>
+                            </tr>
+                        `;
+                    });
+                    $("#tbl-admin-bookings tbody").html(bookingRows);
+                    if ($.fn.DataTable) {
+                        adminBookingsTable = $("#tbl-admin-bookings").DataTable({
+                            language: { url: "https://cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" }
+                        });
+                    }
+
+                    // จัดการการส่งงาน
+                    let subRows = "";
+                    res.submissions.forEach(sub => {
+                        let statusBadge = "";
+                        let actionBtns = "";
+                        const status = sub.Status || sub.status;
+
+                        if (status === "Passed") {
+                            statusBadge = '<span class="badge bg-success">ผ่านการตรวจ</span>';
+                            actionBtns = `<button class="btn btn-outline-danger btn-sm" onclick="changeSubmissionStatus('${sub.id}', 'Improve')"><i class="bi bi-exclamation-triangle"></i> ปรับปรุง</button>`;
+                        } else if (status === "Improve") {
+                            statusBadge = '<span class="badge bg-danger">ควรปรับปรุง</span>';
+                            actionBtns = `<button class="btn btn-outline-success btn-sm" onclick="changeSubmissionStatus('${sub.id}', 'Passed')"><i class="bi bi-check-circle"></i> ผ่าน</button>`;
+                        } else {
+                            statusBadge = '<span class="badge bg-warning text-dark">รอการตรวจ</span>';
+                            actionBtns = `
+                                <button class="btn btn-success btn-sm me-1 text-white" onclick="changeSubmissionStatus('${sub.id}', 'Passed')"><i class="bi bi-check2"></i> ผ่าน</button>
+                                <button class="btn btn-danger btn-sm" onclick="changeSubmissionStatus('${sub.id}', 'Improve')"><i class="bi bi-x-octagon"></i> ไม่ผ่าน</button>
+                            `;
+                        }
+
+                        let planLink = "";
+                        const planUrl = sub.PlanUrl || sub.planUrl;
+                        if (planUrl && planUrl.trim() !== "") {
+                            planLink = `<a href="${planUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-pdf"></i> แผนการสอน</a>`;
+                        } else {
+                            planLink = `<span class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle"></i> ไม่มีไฟล์แผน</span>`;
+                        }
+
+                        let mediaLink = "";
+                        const mediaUrl = sub.MediaUrl || sub.mediaUrl;
+                        if (mediaUrl && mediaUrl.trim() !== "") {
+                            mediaLink = `<a href="${mediaUrl}" target="_blank" class="btn btn-sm btn-outline-info"><i class="bi bi-paperclip"></i> สื่อประกอบ</a>`;
+                        } else {
+                            mediaLink = `<span class="text-muted small">ไม่มีสื่อ</span>`;
+                        }
+
+                        let imgLinks = "";
+                        const img1 = sub.Image1Url || sub.image1Url;
+                        const img2 = sub.Image2Url || sub.image2Url;
+                        const img3 = sub.Image3Url || sub.image3Url;
+                        const img4 = sub.Image4Url || sub.image4Url;
+                        
+                        imgLinks += img1 && img1.trim() !== "" ? `<a href="${img1}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"><i class="bi bi-image"></i> 1</a> ` : '<span class="text-muted small">ไม่มีรูป 1</span> ';
+                        imgLinks += img2 && img2.trim() !== "" ? `<a href="${img2}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"><i class="bi bi-image"></i> 2</a> ` : '<span class="text-muted small">ไม่มีรูป 2</span> ';
+                        imgLinks += img3 && img3.trim() !== "" ? `<a href="${img3}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"><i class="bi bi-image"></i> 3</a> ` : '<span class="text-muted small">ไม่มีรูป 3</span> ';
+                        imgLinks += img4 && img4.trim() !== "" ? `<a href="${img4}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"><i class="bi bi-image"></i> 4</a> ` : '<span class="text-muted small">ไม่มีรูป 4</span> ';
+
+                        subRows += `
+                            <tr>
+                                <td>${sub.Timestamp ? sub.Timestamp.substring(0, 10) : '--'}</td>
+                                <td class="fw-bold">${sub.TeacherName || sub.teacherName}</td>
+                                <td>${planLink}</td>
+                                <td>${mediaLink}</td>
+                                <td>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        ${imgLinks}
+                                    </div>
+                                </td>
+                                <td>${statusBadge}</td>
+                                <td><div class="d-flex">${actionBtns}</div></td>
+                            </tr>
+                        `;
+                    });
+                    $("#tbl-admin-submissions tbody").html(subRows);
+                    if ($.fn.DataTable) {
+                        adminSubmissionsTable = $("#tbl-admin-submissions").DataTable({
+                            language: { url: "https://cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" }
+                        });
+                    }
+
+                    // พิมพ์รับรองรายบุคคล
+                    let printSelectHtml = '<option value="" disabled selected>-- เลือกครูที่ได้รับการประเมิน --</option>';
+                    if (res.evaluations && res.evaluations.length > 0) {
+                        res.evaluations.forEach(ev => {
+                            printSelectHtml += `<option value="${ev.id}">${ev.TeacherName || ev.teacherName} (คะแนน: ${ev.AverageScore || ev.averageScore || '0.00'})</option>`;
+                        });
+                    }
+                    $("#report-teacher-select").html(printSelectHtml);
+                }
+            });
+        }
+
+        function changeBookingStatus(id, newStatus) {
+            Swal.fire({
+                title: 'ยืนยันการเปลี่ยนสถานะจอง?',
+                text: `คุณต้องการปรับสถานะเป็น "${newStatus === 'Confirmed' ? 'อนุมัติการนิเทศ' : 'รอตรวจสอบ'}" หรือไม่?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2196F3'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังดำเนินการ...', didOpen: () => Swal.showLoading() });
+                    callAPI("updateBookingStatus", { id: id, status: newStatus }).then(() => {
+                        Swal.close();
+                        Swal.fire('อัปเดตเรียบร้อย', '', 'success');
+                        loadAdminData();
+                        loadDashboard();
+                    });
+                }
+            });
+        }
+
+        function changeSubmissionStatus(id, newStatus) {
+            Swal.fire({
+                title: 'ยืนยันผลการตรวจผลงาน?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2196F3'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังปรับปรุงสถานะ...', didOpen: () => Swal.showLoading() });
+                    callAPI("updateSubmissionStatus", { id: id, status: newStatus }).then(() => {
+                        Swal.close();
+                        Swal.fire('ตรวจงานเสร็จสิ้น', '', 'success');
+                        loadAdminData();
+                        loadDashboard();
+                    });
+                }
+            });
+        }
+
+        function deleteBookingRecord(id) {
+            Swal.fire({
+                title: 'ยืนยันลบการจอง?',
+                text: "ข้อมูลนี้จะถูกลบถาวรใน Google Sheets",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF5350'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังลบ...', didOpen: () => Swal.showLoading() });
+                    callAPI("deleteBooking", id).then(() => {
+                        Swal.close();
+                        Swal.fire('ลบเรียบร้อยแล้ว', '', 'success');
+                        loadAdminData();
+                        loadDashboard(); // รีโหลดข้อมูลปฏิทินและตารางหน้าแรกด้วย
+                    });
+                }
+            });
+        }
+
+        // ฟังก์ชันสำหรับครูในการยกเลิกการจอง
+        function cancelBookingTeacher(id, teacherName) {
+            Swal.fire({
+                title: 'ยืนยันการยกเลิกจองวันนิเทศ?',
+                text: `คุณครูต้องการยกเลิกสิทธิ์การจองของ "${teacherName}" หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF5350',
+                cancelButtonColor: '#78909C',
+                confirmButtonText: 'ใช่, ต้องการยกเลิก',
+                cancelButtonText: 'ไม่ใช่'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังยกเลิกการจอง...', didOpen: () => Swal.showLoading() });
+                    callAPI("deleteBooking", id).then(res => {
+                        Swal.close();
+                        if (res.status === "success") {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ยกเลิกการจองเรียบร้อย!',
+                                text: 'คุณครูสามารถทำการเลือกจองวันอื่นใหม่ได้ทันที',
+                                confirmButtonColor: '#2196F3'
+                            }).then(() => {
+                                loadDashboard(); // รีโหลดเพื่ออัปเดตปฏิทินและตาราง
+                            });
+                        } else {
+                            Swal.fire('ข้อผิดพลาด', res.message || 'ไม่สามารถยกเลิกได้', 'error');
+                        }
+                    }).catch(err => {
+                        Swal.close();
+                        Swal.fire('ข้อผิดพลาด', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function openAddBookingModal() {
+            new bootstrap.Modal(document.getElementById('modal-add-booking')).show();
+        }
+
+        function openEditBookingModal(encodedData) {
+            const data = JSON.parse(decodeURIComponent(encodedData));
+            const form = document.getElementById("form-admin-edit-booking");
+            
+            form.id.value = data.id;
+            form.rowNum.value = data.rowNum || '';
+            form.teacherName.value = data.TeacherName || data.teacherName;
+            form.department.value = data.Department || data.department;
+            form.date.value = data.Date || data.date;
+            form.time.value = data.Time || data.time;
+            form.period.value = data.Period || data.period;
+            form.subject.value = data.Subject || data.subject;
+            form.subjectCode.value = data.SubjectCode || data.subjectCode;
+            form.classRoom.value = data.ClassRoom || data.classRoom;
+
+            new bootstrap.Modal(document.getElementById('modal-edit-booking')).show();
+        }
+
+        // ========================================================
+        // A4 PRINT LAYOUT PROCESSORS
+        // ========================================================
+        function printDepartmentSummary() {
+            const dept = $("#report-dept-select").val();
+            
+            callAPI("getAdminData").then(res => {
+                if (res.status === "success") {
+                    // กรองรายวันติดภารกิจออกจากการพิมพ์รายงานสรุปนิเทศรายกลุ่มสาระฯ
+                    let filtered = res.bookings.filter(b => {
+                        const name = b.TeacherName || b.teacherName || "";
+                        const isBusy = isBusyDayCheck(name);
+                        return !isBusy;
+                    });
+                    if (dept !== "ทั้งหมด") {
+                        filtered = filtered.filter(b => b.Department === dept || b.department === dept);
+                    }
+                    
+                    $("#print-summary-dept").text(dept);
+                    $("#print-summary-date").text(new Date().toLocaleDateString('th-TH'));
+
+                    let rows = "";
+                    if (filtered.length > 0) {
+                        filtered.forEach((b, index) => {
+                            const matchEval = res.evaluations.find(e => e.TeacherName === b.TeacherName || e.teacherName === b.teacherName);
+                            let ratingText = matchEval ? `${matchEval.Rating || matchEval.rating} (${matchEval.AverageScore || matchEval.averageScore || '0.00'})` : "ยังไม่ได้รับการประเมิน";
+                            
+                            rows += `
+                                <tr class="border-dark">
+                                    <td class="text-center">${index + 1}</td>
+                                    <td class="fw-bold">${b.TeacherName || b.teacherName}</td>
+                                    <td>${b.Subject || b.subject} (${b.SubjectCode || b.subjectCode})</td>
+                                    <td class="text-center">${formatThaiBEDate(b.Date || b.date)}</td>
+                                    <td class="text-center fw-bold">${ratingText}</td>
+                                    <td>${(b.Status || b.status) === 'Supervised' ? 'ประเมินเสร็จสมบูรณ์' : 'อยู่ระหว่างดำเนินการ'}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        rows = `<tr class="border-dark"><td colspan="6" class="text-center text-muted">ไม่พบข้อมูลการประเมินการนิเทศในกลุ่มสาระฯ นี้</td></tr>`;
+                    }
+                    
+                    $("#print-summary-tbody").html(rows);
+                    $(".print-container").removeClass("active-print");
+                    $("#print-dept-summary").addClass("active-print");
+                    window.print();
+                }
+            });
+        }
+
+        function printIndividualCertificate() {
+            const evalId = $("#report-teacher-select").val();
+            if (!evalId) {
+                Swal.fire("ข้อเสนอแนะ", "กรุณาเลือกชื่อครูในรายการที่มีการประเมินก่อน", "warning");
+                return;
+            }
+
+            callAPI("getAdminData").then(res => {
+                if (res.status === "success") {
+                    const matchEval = res.evaluations.find(e => e.id === evalId);
+                    if (!matchEval) return;
+                    
+                    const matchBooking = res.bookings.find(b => (b.TeacherName || b.teacherName) === (matchEval.TeacherName || matchEval.teacherName));
+                    
+                    // ตั้งค่าข้อความการพิมพ์หน้า A4 ใบรับรอง
+                    $("#cert-teacher-name, #cert-teacher-name-page2, .cert-teacher-name-sig").text(matchEval.TeacherName || matchEval.teacherName);
+                    $("#cert-subject").text(matchBooking ? matchBooking.Subject || matchBooking.subject : "--");
+                    $("#cert-code").text(matchBooking ? matchBooking.SubjectCode || matchBooking.subjectCode : "--");
+                    $("#cert-class").text(matchBooking ? matchBooking.ClassRoom || matchBooking.classRoom : "--");
+                    $("#cert-date").text(formatThaiBEDate(matchEval.Date || matchEval.date));
+                    $("#cert-avg-score").text(matchEval.AverageScore || matchEval.averageScore || "0.00");
+                    $("#cert-rating").text(matchEval.Rating || matchEval.rating);
+                    $("#cert-strengths").text(matchEval.Strengths || matchEval.strengths);
+                    $("#cert-improvement").text(matchEval.Improvement || matchEval.improvement);
+
+                    // สร้างตารางประเมินผล 16 ข้อในการพิมพ์รับรองผล
+                    let scoresObj = {};
+                    try {
+                        scoresObj = typeof matchEval.ScoresJSON === "string" ? JSON.parse(matchEval.ScoresJSON) : (matchEval.ScoresJSON || matchEval.scores || {});
+                    } catch(err) {
+                        scoresObj = matchEval.scores || {};
+                    }
+
+                    // จัดกลุ่มคะแนนตามด้านเพื่อพิมพ์เป็นตารางขนาดเล็ก 6 แถว (เนื่องจากพฤติกรรมนักเรียนมีมากที่สุดคือ 6 ข้อ)
+                    let detailedRows = "";
+                    
+                    // กรองรายหัวข้อตามกลุ่ม
+                    const roomItems = EVAL_ITEMS.filter(x => x.category === "สภาพห้องเรียน");
+                    const teacherItems = EVAL_ITEMS.filter(x => x.category === "พฤติกรรมของครู");
+                    const studentItems = EVAL_ITEMS.filter(x => x.category === "พฤติกรรมของนักเรียน");
+
+                    for (let i = 0; i < 6; i++) {
+                        let rText = "", rVal = "";
+                        let tText = "", tVal = "";
+                        let sText = "", sVal = "";
+
+                        if (i < roomItems.length) {
+                            rText = roomItems[i].text;
+                            rVal = scoresObj[roomItems[i].id] || "--";
+                        }
+                        if (i < teacherItems.length) {
+                            tText = teacherItems[i].text;
+                            tVal = scoresObj[teacherItems[i].id] || "--";
+                        }
+                        if (i < studentItems.length) {
+                            sText = studentItems[i].text;
+                            sVal = scoresObj[studentItems[i].id] || "--";
+                        }
+
+                        detailedRows += `
+                            <tr class="border-dark">
+                                <td style="padding: 3px;">${rText}</td>
+                                <td class="text-center fw-bold" style="padding: 3px;">${rVal}</td>
+                                <td style="padding: 3px;">${tText}</td>
+                                <td class="text-center fw-bold" style="padding: 3px;">${tVal}</td>
+                                <td style="padding: 3px;">${sText}</td>
+                                <td class="text-center fw-bold" style="padding: 3px;">${sVal}</td>
+                            </tr>
+                        `;
+                    }
+                    $("#cert-detailed-scores-tbody").html(detailedRows);
+                    $(".print-container").removeClass("active-print");
+                    $("#print-indiv-cert").addClass("active-print");
+                    window.print();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

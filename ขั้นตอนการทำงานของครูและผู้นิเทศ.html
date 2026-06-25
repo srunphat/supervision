@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ขั้นตอนการทำงานสำหรับคุณครูและผู้นิเทศ โรงเรียนวัดบ้านดาบ</title>
+    <!-- Google Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #F4F8FA;
+            color: #37474F;
+            padding: 30px 15px;
+        }
+        .manual-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header-title {
+            color: #4CAF50;
+            font-weight: 700;
+        }
+        .role-header-teacher {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .role-header-supervisor {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .content-box-teacher {
+            border: 2px solid #E3F2FD;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            background-color: #FAFDFF;
+            height: 100%;
+        }
+        .content-box-supervisor {
+            border: 2px solid #E8F5E9;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            background-color: #FAFFFA;
+            height: 100%;
+        }
+        .step-list {
+            padding-left: 20px;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        .step-list li {
+            margin-bottom: 12px;
+        }
+        @media print {
+            body {
+                background-color: #FFFFFF;
+                padding: 0;
+            }
+            .manual-card {
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="manual-card">
+        <div class="text-center mb-4">
+            <h2 class="header-title mb-2"><i class="bi bi-person-check-fill me-2"></i>ขั้นตอนการทำงานสำหรับคุณครูและผู้นิเทศ</h2>
+            <h4 class="text-muted">โรงเรียนวัดบ้านดาบ</h4>
+            <p class="text-secondary mb-0">ระบบการนิเทศภายในสถานศึกษา (คู่มือสรุปบทบาทเฉพาะผู้ปฏิบัติงานจริง)</p>
+            <button class="btn btn-outline-success btn-sm mt-3 no-print" onclick="window.print()"><i class="bi bi-printer-fill me-1"></i> สั่งพิมพ์คู่มือนี้เป็นกระดาษหรือ PDF</button>
+        </div>
+
+        <hr class="mb-4">
+
+        <!-- Role columns -->
+        <div class="row g-4">
+            <!-- 1. Teacher -->
+            <div class="col-md-6 d-flex flex-column">
+                <div class="role-header-teacher">
+                    <h5 class="mb-0"><i class="bi bi-person-workspace me-2"></i>🧑‍🏫 1. ครูผู้รับการนิเทศ</h5>
+                </div>
+                <div class="content-box-teacher flex-grow-1">
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-1-circle-fill me-1"></i>ขั้นตอนการจองคิวการสอน</h6>
+                    <ol class="step-list">
+                        <li>ไปที่แท็บเมนู <strong>"จองวันนิเทศ"</strong></li>
+                        <li>กรอกข้อมูลรายละเอียดของตนเองให้เรียบร้อย:
+                            <ul>
+                                <li>ชื่อ-นามสกุล ครูผู้รับการนิเทศ</li>
+                                <li>เลือกกลุ่มสาระการเรียนรู้</li>
+                                <li>ระบุวันที่และเวลาที่สะดวกในการจัดกิจกรรม</li>
+                                <li>เลือกคาบเรียนที่ (1 ถึง 8)</li>
+                                <li>กรอกชื่อวิชา รหัสวิชา และชั้นเรียน/ห้อง</li>
+                            </ul>
+                        </li>
+                        <li>คลิกปุ่ม <strong>"บันทึกการจองวันนิเทศ"</strong> เพื่อส่งข้อมูลเข้าสู่คิวระบบ (รอแอดมินอนุมัติ)</li>
+                    </ol>
+
+                    <h6 class="fw-bold text-primary mt-4 mb-3"><i class="bi bi-2-circle-fill me-1"></i>ขั้นตอนการส่งแผนและไฟล์ผลงาน</h6>
+                    <ol class="step-list">
+                        <li>ไปที่แท็บเมนู <strong>"ส่งงาน/แผนการสอน"</strong></li>
+                        <li>กรอกชื่อ-นามสกุลจริงเดิมที่จองวันนิเทศไว้</li>
+                        <li>อัปโหลดไฟล์แผนการจัดการเรียนรู้ (รองรับ PDF / Word)</li>
+                        <li>แนบไฟล์สื่อการสอนประกอบการสอน (ถ้ามี)</li>
+                        <li>อัปโหลดรูปถ่ายห้องเรียนจริง <strong>4 รูปภาพหลัก</strong> ดังนี้:
+                            <ul>
+                                <li>รูป 1: บรรยากาศห้องเรียน</li>
+                                <li>รูป 2: การทำกิจกรรมของนักเรียน</li>
+                                <li>รูป 3: สื่อ/ชิ้นงาน หรือใบงานนักเรียน</li>
+                                <li>รูป 4: ครูผู้สอนขณะจัดกิจกรรม</li>
+                            </ul>
+                        </li>
+                        <li>คลิกปุ่ม <strong>"อัปโหลดและส่งงาน"</strong> เพื่อจัดเก็บไฟล์เข้า Google Drive</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 2. Supervisor -->
+            <div class="col-md-6 d-flex flex-column">
+                <div class="role-header-supervisor">
+                    <h5 class="mb-0"><i class="bi bi-check-square me-2"></i>📝 2. ผู้นิเทศ (ผอ. / หัวหน้าวิชาการ)</h5>
+                </div>
+                <div class="content-box-supervisor flex-grow-1">
+                    <h6 class="fw-bold text-success mb-3"><i class="bi bi-1-circle-fill me-1"></i>ขั้นตอนการเตรียมเข้าประเมิน</h6>
+                    <ol class="step-list">
+                        <li>ไปที่แท็บเมนู <strong>"ประเมินผล"</strong></li>
+                        <li>เลือกรายชื่อคุณครูผู้รับนิเทศที่มีคิวอนุมัติแล้ว</li>
+                        <li>เลือกวันที่ประเมินนิเทศตามความเป็นจริง</li>
+                    </ol>
+
+                    <h6 class="fw-bold text-success mt-4 mb-3"><i class="bi bi-2-circle-fill me-1"></i>ขั้นตอนการให้ระดับคะแนน (16 ข้อ)</h6>
+                    <ol class="step-list">
+                        <li>ลงคะแนนประเมินเกณฑ์ 5 ระดับ (1-5 คะแนน) ให้ครบถ้วนทุกข้อ แบ่งเป็น 3 ด้านหลัก ดังนี้:
+                            <ul>
+                                <li><strong>ด้านสภาพห้องเรียน</strong> (ข้อ 1 - 5)</li>
+                                <li><strong>ด้านพฤติกรรมของครู</strong> (ข้อ 1 - 5)</li>
+                                <li><strong>ด้านพฤติกรรมของนักเรียน</strong> (ข้อ 1 - 6)</li>
+                            </ul>
+                        </li>
+                        <li>ตรวจสอบคะแนนเฉลี่ยและการแปลความหมายที่คำนวณอัตโนมัติบนการ์ดสรุปผล</li>
+                        <li>ป้อนบันทึกรายละเอียดประเด็นสำคัญเพิ่มเติม:
+                            <ul>
+                                <li>ระบุจุดเด่นที่พบเห็นเด่นชัดในการสอน</li>
+                                <li>ระบุจุดที่ควรพัฒนาและปรับปรุงเพิ่มเติม</li>
+                                <li>กรอกข้อเสนอแนะทั่วไป</li>
+                            </ul>
+                        </li>
+                        <li>คลิกปุ่ม <strong>"ส่งบันทึกและประเมินผลการนิเทศ"</strong> เพื่อยืนยันบันทึกผลงานลงระบบ Google Sheets</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 text-muted small border-top pt-3">
+            <p class="mb-0">© ระบบการนิเทศภายในโรงเรียนวัดบ้านดาบ | คู่มือแบบหน้าเดียวเฉพาะบทบาทครูและผู้นิเทศ</p>
+        </div>
+    </div>
+
+</body>
+</html>
