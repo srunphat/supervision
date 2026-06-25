@@ -116,6 +116,8 @@ function executeActionFromServer(action, payload) {
         return submitWork(payload);
       case "addEvaluation":
         return addEvaluation(payload);
+      case "getSubmissionImagesBase64":
+        return getSubmissionImagesBase64(payload);
       case "getSystemLogs":
         return getSystemLogs();
       default:
@@ -619,6 +621,66 @@ function getSystemLogs() {
     var sheet = ss.getSheetByName("SystemLogs");
     if (!sheet) return { status: "success", logs: [] };
     return { status: "success", logs: getSheetDataAsJson(sheet) };
+  } catch (err) {
+    return { status: "error", message: err.toString() };
+  }
+}
+
+/**
+ * ดึงภาพกิจกรรมทั้ง 4 ในรูป Base64 จาก Google Drive สำหรับเรนเดอร์ในใบพิมพ์รายงานโดยไม่ติดปัญหาความปลอดภัย
+ */
+function getSubmissionImagesBase64(payload) {
+  try {
+    var ss = getTargetSpreadsheet();
+    var sheet = ss.getSheetByName("Submissions");
+    var data = sheet.getDataRange().getValues();
+    
+    var teacherName = payload.teacherName;
+    var cleanName = function(name) { return name ? name.toString().replace(/\s+/g, "") : ""; };
+    var targetClean = cleanName(teacherName);
+    
+    var subRow = null;
+    for (var i = data.length - 1; i >= 1; i--) {
+      if (cleanName(data[i][2]) === targetClean) {
+        subRow = data[i];
+        break;
+      }
+    }
+    
+    if (!subRow) {
+      return { status: "success", images: ["", "", "", ""] };
+    }
+    
+    var urls = [subRow[5], subRow[6], subRow[7], subRow[8]]; // Image1Url, Image2Url, Image3Url, Image4Url
+    var base64s = [];
+    
+    for (var j = 0; j < urls.length; j++) {
+      var url = urls[j];
+      var base64Str = "";
+      if (url && url.toString().trim() !== "") {
+        var fileId = "";
+        var str = url.toString();
+        if (str.indexOf("/file/d/") !== -1) {
+          fileId = str.split("/file/d/")[1].split("/")[0].split("?")[0];
+        } else if (str.indexOf("id=") !== -1) {
+          fileId = str.split("id=")[1].split("&")[0];
+        }
+        
+        if (fileId) {
+          try {
+            var file = DriveApp.getFileById(fileId);
+            var blob = file.getBlob();
+            var bytes = blob.getBytes();
+            base64Str = "data:" + blob.getContentType() + ";base64," + Utilities.base64Encode(bytes);
+          } catch (fileErr) {
+            console.warn("Error reading file " + fileId + ": " + fileErr.toString());
+          }
+        }
+      }
+      base64s.push(base64Str);
+    }
+    
+    return { status: "success", images: base64s };
   } catch (err) {
     return { status: "error", message: err.toString() };
   }

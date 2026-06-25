@@ -849,7 +849,7 @@
     <!-- Footer Area -->
     <footer class="no-print">
         <div class="container">
-            <p class="mb-1">&copy; 2026 ระบบการนิเทศโรงเรียนวัดบ้านดาบ | พัฒนาโดย ผอ.ศรัณย์ภัทร สุดหล่อ <span class="badge bg-primary ms-1">เวอร์ชัน 2.7 (ปรับปรุงการแสดงผลภาพสำหรับบัญชีโรงเรียน)</span></p>
+            <p class="mb-1">&copy; 2026 ระบบการนิเทศโรงเรียนวัดบ้านดาบ | พัฒนาโดย ผอ.ศรัณย์ภัทร สุดหล่อ <span class="badge bg-primary ms-1">เวอร์ชัน 2.8 (แก้ไขการดาวน์โหลดรูปเพื่อพิมพ์เกยรติบัตร)</span></p>
             <small class="text-muted">ใช้เฉพาะระบบงานบริหารวิชาการโรงเรียนวัดบ้านดาบเท่านั้น เป็นลิขสิทธิ์ของ ผอ.ศรัณย์ภัทร สุดหล่อ</small>
         </div>
     </footer>
@@ -2598,46 +2598,46 @@
                     }
                     $("#cert-detailed-scores-tbody").html(detailedRows);
 
-                    // ดึงภาพถ่าย 4 รูปที่ครูอัปโหลด (เปรียบเทียบชื่อโดยตัดช่องว่างออกเพื่อป้องกันปัญหาวรรคเบิ้ล)
+                    // ดึงภาพถ่าย 4 รูปที่ครูอัปโหลด (ผ่านทาง Apps Script เพื่อแปลงเป็น Base64 ป้องกันปัญหาความปลอดภัยในหน้าพิมพ์)
                     $("#cert-teacher-name-page3").text(matchEval.TeacherName || matchEval.teacherName);
                     
-                    const cleanName = (name) => name ? name.replace(/\s+/g, "") : "";
-                    const matchSub = res.submissions.find(s => {
-                        const sName = cleanName(s.TeacherName || s.teacherName);
-                        const eName = cleanName(matchEval.TeacherName || matchEval.teacherName);
-                        return sName === eName;
+                    Swal.fire({
+                        title: 'กำลังดาวน์โหลดรูปภาพกิจกรรม...',
+                        html: 'ระบบกำลังดึงข้อมูลภาพความละเอียดสูงจาก Google Drive กรุณารอสักครู่ (ประมาณ 2-3 วินาที)',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
                     });
 
-                    const getDirectImageLink = (url) => {
-                        if (!url) return "";
-                        let str = url.toString().trim();
-                        if (str.includes("drive.google.com")) {
-                            let fileId = "";
-                            if (str.includes("/file/d/")) {
-                                fileId = str.split("/file/d/")[1].split("/")[0].split("?")[0];
-                            } else if (str.includes("id=")) {
-                                fileId = str.split("id=")[1].split("&")[0];
-                            }
-                            if (fileId) {
-                                return "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1000";
-                            }
-                        }
-                        return str;
-                    };
+                    callAPI("getSubmissionImagesBase64", { teacherName: matchEval.TeacherName || matchEval.teacherName }).then(imgRes => {
+                        Swal.close();
+                        
+                        const img1 = imgRes.status === "success" && imgRes.images[0] ? imgRes.images[0] : "";
+                        const img2 = imgRes.status === "success" && imgRes.images[1] ? imgRes.images[1] : "";
+                        const img3 = imgRes.status === "success" && imgRes.images[2] ? imgRes.images[2] : "";
+                        const img4 = imgRes.status === "success" && imgRes.images[3] ? imgRes.images[3] : "";
 
-                    const img1 = matchSub ? getDirectImageLink(matchSub.Image1Url || matchSub.image1Url) : "";
-                    const img2 = matchSub ? getDirectImageLink(matchSub.Image2Url || matchSub.image2Url) : "";
-                    const img3 = matchSub ? getDirectImageLink(matchSub.Image3Url || matchSub.image3Url) : "";
-                    const img4 = matchSub ? getDirectImageLink(matchSub.Image4Url || matchSub.image4Url) : "";
+                        $("#cert-img1").attr("src", img1 || "https://placehold.co/400x300?text=No+Image");
+                        $("#cert-img2").attr("src", img2 || "https://placehold.co/400x300?text=No+Image");
+                        $("#cert-img3").attr("src", img3 || "https://placehold.co/400x300?text=No+Image");
+                        $("#cert-img4").attr("src", img4 || "https://placehold.co/400x300?text=No+Image");
 
-                    $("#cert-img1").attr("src", img1 || "https://placehold.co/400x300?text=No+Image");
-                    $("#cert-img2").attr("src", img2 || "https://placehold.co/400x300?text=No+Image");
-                    $("#cert-img3").attr("src", img3 || "https://placehold.co/400x300?text=No+Image");
-                    $("#cert-img4").attr("src", img4 || "https://placehold.co/400x300?text=No+Image");
-
-                    $(".print-container").removeClass("active-print");
-                    $("#print-indiv-cert").addClass("active-print");
-                    window.print();
+                        $(".print-container").removeClass("active-print");
+                        $("#print-indiv-cert").addClass("active-print");
+                        
+                        // หน่วงเวลา 500ms เพื่อให้เบราว์เซอร์นำภาพ Base64 มาแสดงในหน้าจอก่อนเรียกคำสั่งปริ้น
+                        setTimeout(() => {
+                            window.print();
+                        }, 500);
+                    }).catch(err => {
+                        Swal.close();
+                        console.error("Error loading print images", err);
+                        
+                        // กรณีที่เกิดข้อผิดพลาดในการโหลดรูป ให้เปิดหน้าปริ้นตามปกติด้วยสัญลักษณ์ภาพเสีย
+                        $("#cert-img1, #cert-img2, #cert-img3, #cert-img4").attr("src", "https://placehold.co/400x300?text=No+Image");
+                        $(".print-container").removeClass("active-print");
+                        $("#print-indiv-cert").addClass("active-print");
+                        window.print();
+                    });
                 }
             });
         }
